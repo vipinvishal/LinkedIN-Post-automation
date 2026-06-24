@@ -375,6 +375,46 @@ class BufferRateLimitError(Exception):
     """Raised when Buffer API returns a rate limit error that cannot be retried within the run."""
 
 
+def _validate_buffer_channel():
+    """Verify BUFFER_CHANNEL_ID is a LinkedIn channel before posting."""
+    query = """
+    query {
+      account {
+        channels {
+          id
+          service
+        }
+      }
+    }
+    """
+    try:
+        resp = requests.post(
+            "https://api.buffer.com",
+            headers={"Content-Type": "application/json", "Authorization": f"Bearer {BUFFER_API_KEY}"},
+            json={"query": query},
+            timeout=15,
+        )
+        data = resp.json()
+        if "errors" in data:
+            return  # can't validate — let the post attempt surface the real error
+        channels = data.get("data", {}).get("account", {}).get("channels", [])
+        for ch in channels:
+            if ch.get("id") == BUFFER_CHANNEL_ID:
+                service = ch.get("service", "").lower()
+                if "linkedin" not in service:
+                    raise RuntimeError(
+                        f"BUFFER_CHANNEL_ID is a '{ch.get('service', 'unknown')}' channel, not LinkedIn.\n"
+                        "  Fix: run  python scripts/get_buffer_channel.py  to list your channels,\n"
+                        "  then update BUFFER_CHANNEL_ID in .env and in your GitHub secret."
+                    )
+                return
+        print(f"  [warn] BUFFER_CHANNEL_ID not found among your Buffer channels — double-check the ID.")
+    except RuntimeError:
+        raise
+    except Exception:
+        pass  # network / parse errors — don't block the run
+
+
 def _is_buffer_rate_limit(data: dict) -> bool:
     """Return True if the Buffer GraphQL response indicates a rate limit error."""
     errors = data.get("errors")
@@ -387,6 +427,7 @@ def _is_buffer_rate_limit(data: dict) -> bool:
 def schedule_to_buffer(post_text: str) -> str:
     """Push the post to Buffer via GraphQL. Schedules 5 minutes from now."""
     print("[ Step 3 ] Scheduling to Buffer...")
+    _validate_buffer_channel()
 
     due_at = (datetime.now(timezone.utc) + timedelta(minutes=5)).isoformat()
 
