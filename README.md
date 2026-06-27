@@ -1,6 +1,6 @@
 # LinkedIn Post Automation
 
-An AI agent that researches trending topics, generates engaging posts, and publishes them to LinkedIn automatically — every day at 10 AM IST.
+An AI agent that researches trending topics, generates engaging posts, and publishes them directly to LinkedIn — 4× every day.
 
 **No VPS needed. No manual work. Fully automated via GitHub Actions.**
 
@@ -9,14 +9,14 @@ An AI agent that researches trending topics, generates engaging posts, and publi
 ## How It Works
 
 ```
-GitHub Actions (10 AM IST daily)
+GitHub Actions (9 AM / 1 PM / 6 PM / 10 PM IST)
         ↓
 Exa — neural web research on a random AI/tech topic
         ↓
 Gemini — generates a viral, first-person post
   └─ fallback: Gemini key #2 → Euron API
         ↓
-Buffer — schedules and publishes to your LinkedIn profile
+LinkedIn API — publishes directly to your profile
 ```
 
 ---
@@ -25,11 +25,11 @@ Buffer — schedules and publishes to your LinkedIn profile
 
 | Tool | Purpose |
 |---|---|
-| **GitHub Actions** | Daily scheduling (replaces VPS/cron) |
+| **GitHub Actions** | 4× daily scheduling (replaces VPS/cron) |
 | **Exa** | Real-time neural web research |
 | **Google Gemini** | Post generation (dual-key with quota rotation) |
 | **Euron API** | Fallback when all Gemini keys are exhausted |
-| **Buffer** | Schedules and publishes posts to LinkedIn |
+| **LinkedIn UGC API** | Direct publishing to LinkedIn |
 
 ---
 
@@ -38,8 +38,8 @@ Buffer — schedules and publishes to your LinkedIn profile
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/vipinvishal/LinkedIN-Post-automation-with-Buffer.git
-cd LinkedIN-Post-automation-with-Buffer
+git clone https://github.com/vipinvishal/LinkedIN-Post-automation.git
+cd LinkedIN-Post-automation
 ```
 
 ### 2. Create a virtual environment and install dependencies
@@ -61,10 +61,10 @@ Fill in your API keys (see [Configuration](#configuration) below).
 ### 4. Test locally before going live
 
 ```bash
-# Preview a generated post without sending to Buffer
+# Preview a generated post without posting to LinkedIn
 python scripts/generate_and_schedule.py --preview
 
-# Run the full pipeline (research → generate → schedule to Buffer)
+# Run the full pipeline (research → generate → post to LinkedIn)
 python scripts/generate_and_schedule.py
 ```
 
@@ -80,17 +80,8 @@ Add these to your `.env` file:
 | `GEMINI_API_KEY_2` | Same — second Google account | Optional (quota fallback) |
 | `EURON_API_KEY` | [euron.one](https://euron.one) | Optional (last-resort fallback) |
 | `EXA_API_KEY` | [exa.ai](https://exa.ai) | Yes |
-| `BUFFER_API_KEY` | buffer.com → Settings → API | Yes |
-| `BUFFER_CHANNEL_ID` | Run `python scripts/get_buffer_channel.py` | Yes |
-
-### Finding your Buffer Channel ID
-
-```bash
-# Make sure BUFFER_API_KEY is set in .env first
-python scripts/get_buffer_channel.py
-```
-
-Copy the ID for your LinkedIn channel and paste it into `.env` as `BUFFER_CHANNEL_ID`.
+| `LINKEDIN_ACCESS_TOKEN` | Run `python scripts/get_linkedin_token.py` | Yes |
+| `LINKEDIN_PERSON_ID` | Run `python scripts/get_linkedin_token.py` | Yes |
 
 ---
 
@@ -104,12 +95,19 @@ Go to **Settings → Secrets and variables → Actions → New repository secret
 - `GEMINI_API_KEY_2`
 - `EURON_API_KEY`
 - `EXA_API_KEY`
-- `BUFFER_API_KEY`
-- `BUFFER_CHANNEL_ID`
+- `LINKEDIN_ACCESS_TOKEN`
+- `LINKEDIN_PERSON_ID`
 
 ### 2. The workflow runs automatically
 
-The workflow is defined in `.github/workflows/daily_post.yml` and triggers every day at **10:00 AM IST (04:30 UTC)**.
+The workflow is defined in `.github/workflows/daily_post.yml` and triggers 4× daily:
+
+| Time (IST) | Content Slot |
+|---|---|
+| 9:00 AM | Breaking AI news / hot take |
+| 1:00 PM | AI educational post |
+| 6:00 PM | Personal learning / build-in-public |
+| 10:00 PM | Advanced AI concept |
 
 You can also trigger it manually anytime:
 **GitHub repo → Actions → Daily LinkedIn Post → Run workflow**
@@ -122,8 +120,7 @@ Edit `scripts/topics.json` to change:
 
 - **`niche`** — the content category
 - **`persona`** — the voice and style of the posts
-- **`topics`** — list of topics to randomly pick from each day
-- **`tones`** — list of tones to randomly apply
+- **`content_slots`** — topics and tones for each time slot
 
 ---
 
@@ -133,7 +130,7 @@ Edit `scripts/topics.json` to change:
 ├── scripts/
 │   ├── generate_and_schedule.py   # main pipeline
 │   ├── topics.json                # niche, topics, tones, persona
-│   └── get_buffer_channel.py      # one-time helper to find Buffer channel ID
+│   └── get_linkedin_token.py      # one-time helper to get LinkedIn tokens
 ├── .github/
 │   └── workflows/
 │       └── daily_post.yml         # GitHub Actions workflow
