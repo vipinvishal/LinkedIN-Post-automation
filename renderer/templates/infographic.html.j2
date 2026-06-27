@@ -11,280 +11,272 @@
   .page {
     width: 900px;
     height: 900px;
-    background-color: #f6f0d2;
+    background-color: #f3ead4;
     background-image: repeating-linear-gradient(
       to bottom,
-      transparent 0px, transparent 30px,
-      #9ab8d6 30px, #9ab8d6 31px
+      transparent 0px, transparent 28px,
+      #adc8e0 28px, #adc8e0 29px
     );
-    font-family: 'Caveat', 'Comic Sans MS', cursive;
+    font-family: 'Caveat', cursive;
     position: relative;
-    padding: 28px 38px 22px 72px;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    border: 5px solid #1a1210;
   }
 
-  /* ── Spiral binding ── */
-  .spiral-line {
-    position: absolute; left: 52px; top: 0; bottom: 0;
-    width: 2px; background: #5a5050; opacity: 0.35;
+  /* spiral rings column */
+  .rings-col {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 56px;
+    background: #ece2c2;
+    border-right: 3px solid #2a1e1e;
+    z-index: 3;
   }
-  .spiral { position: absolute; left: 24px; top: 22px; bottom: 22px; width: 56px; }
   .ring {
-    position: absolute; left: 0;
-    width: 42px; height: 20px;
-    border: 4px solid #5a5050;
+    position: absolute; left: 8px;
+    width: 40px; height: 22px;
+    border: 3.5px solid #2a1e1e;
     border-radius: 50%;
     border-bottom-color: transparent;
     border-left-color: transparent;
     transform: rotate(-20deg);
   }
 
-  /* ── Header ── */
-  .header {
-    display: flex; align-items: flex-start;
-    gap: 14px; margin-bottom: 14px; position: relative;
+  /* content starts after rings */
+  .content {
+    position: absolute; left: 56px; top: 0; right: 0; bottom: 0;
   }
+
+  /* logo box */
   .logo-box {
+    border: 3.5px solid #1a1a1a;
     width: 58px; height: 58px;
-    border: 3px solid #111;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px; font-weight: 700; color: #111;
-    flex-shrink: 0; letter-spacing: -0.5px;
-  }
-  .title-wrap { flex: 1; }
-  .t1 {
-    font-size: 35px; font-weight: 700; color: #111;
-    text-transform: uppercase; line-height: 1.0; letter-spacing: 0.5px;
-  }
-  .t2 {
-    font-size: 35px; font-weight: 700; color: #1a6cbf;
-    text-transform: uppercase; line-height: 1.05; letter-spacing: 0.5px;
+    font-size: 26px; font-weight: 700; color: #1a1a1a;
+    flex-shrink: 0; letter-spacing: -1px;
   }
 
-  /* ── Divider ── */
-  .divider { height: 2.5px; background: #111; border-radius: 1px; margin-bottom: 14px; }
-
-  /* ── 5-box grid (stretches to fill remaining space) ── */
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 70px 1fr;
-    grid-template-rows: 1fr 52px 1fr;
-    flex: 1;
-    margin-bottom: 12px;
-    min-height: 0;
+  /* node label (box with border) */
+  .node-label {
+    display: inline-block;
+    border: 3.5px solid #1a1a1a;
+    padding: 5px 16px 4px 16px;
+    font-size: 26px; font-weight: 700; color: #1a1a1a;
+    letter-spacing: 0.5px;
+    background: rgba(243,234,212,0.6);
   }
 
-  .box {
-    border: 3px solid #111; padding: 10px 13px;
-    display: flex; flex-direction: column; gap: 4px;
+  /* bullet points outside the box */
+  .node-pts {
+    list-style: none;
+    margin-top: 8px;
+    margin-left: 5px;
   }
-  .box-label {
-    font-size: 20px; font-weight: 700; color: #111;
-    text-transform: uppercase; line-height: 1.0;
+  .node-pts li {
+    font-size: 21px;
+    color: #1a1a1a;
+    line-height: 1.5;
   }
-  .box-pts { list-style: none; }
-  .box-pts li { font-size: 15.5px; color: #111; line-height: 1.5; }
-  .box-pts li::before { content: "• "; }
+  .node-pts li::before { content: "• "; }
 
-  /* center (narrow) box */
-  .box-c {
-    border: 3px solid #111; padding: 8px 7px; margin: 2px;
-    display: flex; flex-direction: column; gap: 3px; height: calc(100% - 4px);
-  }
-  .box-c .box-label { font-size: 15px; text-align: center; }
-  .box-c .box-pts li { font-size: 12.5px; line-height: 1.4; }
+  /* each node is absolutely positioned */
+  .node { position: absolute; }
 
-  /* ── Arrow cells ── */
-  .arr-hr { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
-  .arr-ul { display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; }
-  .arr-dr { display: flex; align-items: flex-start; justify-content: center; padding-top: 4px; }
-  .arr-mid { display: flex; align-items: center; justify-content: center; }
-
-  /* ── Bottom deco row ── */
-  .deco-row {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 10px; padding: 0 2px;
-  }
-  .lines { display: flex; flex-direction: column; gap: 5px; }
-  .ln { height: 3px; background: #111; border-radius: 1px; }
-
-  /* ── Quote ── */
-  .quote {
-    border: 2.5px solid #111; background: #fff9c4;
-    padding: 10px 18px; font-size: 17px; color: #111;
-    text-align: center; line-height: 1.45; margin-bottom: 8px;
-  }
-  .quote::before { content: '\201C'; font-size: 28px; font-weight: 700; }
-  .quote::after  { content: '\201D'; font-size: 28px; font-weight: 700; }
-
-  /* ── Footer ── */
-  .footer { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+  /* handle footer */
+  .handle { font-size: 20px; color: #555; font-style: italic; }
   .fi {
-    width: 26px; height: 26px; border: 2.5px solid #111; border-radius: 7px;
-    position: relative; flex-shrink: 0;
+    width: 27px; height: 27px; border: 2.5px solid #555;
+    border-radius: 7px; position: relative; flex-shrink: 0;
   }
   .fi::before {
     content: ''; position: absolute; left: 50%; top: 50%;
     transform: translate(-50%,-50%);
-    width: 12px; height: 12px; border: 2px solid #111; border-radius: 50%;
+    width: 12px; height: 12px; border: 2px solid #555; border-radius: 50%;
   }
   .fi::after {
     content: ''; position: absolute; right: 4px; top: 4px;
-    width: 3px; height: 3px; background: #111; border-radius: 50%;
+    width: 3px; height: 3px; background: #555; border-radius: 50%;
   }
-  .handle { font-size: 17px; color: #555; font-style: italic; }
-
-  /* ── Pencil deco ── */
-  .pencil { position: absolute; right: 40px; top: 100px; font-size: 28px; opacity: 0.45; transform: rotate(18deg); }
 </style>
 </head>
 <body>
 <div class="page">
 
-  <div class="spiral-line"></div>
-  <div class="spiral">
-    {% for i in range(15) %}<div class="ring" style="top:{{ i*54 }}px"></div>{% endfor %}
+  <!-- Rings -->
+  <div class="rings-col">
+    {% for i in range(14) %}<div class="ring" style="top:{{ 18 + i*62 }}px"></div>{% endfor %}
   </div>
 
-  <!-- Header -->
-  <div class="header">
-    <div class="logo-box">AI</div>
-    <div class="title-wrap">
-      <div class="t1">{{ title_line1 }}</div>
-      <div class="t2">{{ title_line2 }}</div>
-    </div>
-    <svg width="88" height="66" viewBox="0 0 88 66" fill="none" style="flex-shrink:0">
-      <rect x="5"  y="50" width="12" height="13" stroke="#111" stroke-width="2"/>
-      <rect x="22" y="38" width="12" height="25" stroke="#111" stroke-width="2"/>
-      <rect x="39" y="24" width="12" height="39" stroke="#111" stroke-width="2"/>
-      <rect x="56" y="12" width="12" height="51" stroke="#111" stroke-width="2"/>
-      <path d="M5 55 Q 34 22 74 7" stroke="#111" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-      <polygon points="74,7 64,10 68,18" fill="#111"/>
-    </svg>
-  </div>
+  <!-- SVG overlay: all arrows, icons, decorations -->
+  <!-- coordinate origin = page x=56 (same as .content left) -->
+  <svg style="position:absolute;left:56px;top:0;pointer-events:none;overflow:visible"
+       width="844" height="900" viewBox="0 0 844 900">
+    <defs>
+      <filter id="rgh" x="-6%" y="-12%" width="112%" height="124%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="n" seed="5"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <marker id="arr" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto">
+        <polygon points="0 0.5, 10 4, 0 7.5" fill="#1a1a1a"/>
+      </marker>
+    </defs>
 
-  <div class="divider"></div>
+    <!-- ── Long horizontal arrow under header ── -->
+    <line x1="20" y1="136" x2="806" y2="136"
+          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
 
-  <!-- 5-box grid -->
-  <div class="grid">
+    <!-- ── STRATEGY → lightbulb ── -->
+    <line x1="208" y1="172" x2="345" y2="212"
+          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
 
-    <!-- ROW 1 -->
-    <div class="box" style="grid-column:1;grid-row:1">
-      <div class="box-label">{{ box1.label }}</div>
-      <ul class="box-pts">{% for p in box1.points %}<li>{{ p }}</li>{% endfor %}</ul>
-    </div>
+    <!-- ── Lightbulb → ENGAGEMENT (center node) ── -->
+    <line x1="372" y1="256" x2="372" y2="336"
+          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
 
-    <div class="arr-hr" style="grid-column:2;grid-row:1">
-      <svg width="60" height="22" viewBox="0 0 60 22" fill="none">
-        <line x1="2" y1="11" x2="48" y2="11" stroke="#111" stroke-width="2.5"/>
-        <polygon points="48,6 60,11 48,16" fill="#111"/>
-      </svg>
-      <div style="font-size:28px;margin-top:4px">💡</div>
-    </div>
+    <!-- ── NETWORK → ENGAGEMENT (diagonal up-right) ── -->
+    <line x1="196" y1="528" x2="284" y2="432"
+          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
 
-    <div class="box" style="grid-column:3;grid-row:1">
-      <div class="box-label">{{ box2.label }}</div>
-      <ul class="box-pts">{% for p in box2.points %}<li>{{ p }}</li>{% endfor %}</ul>
-      <div style="text-align:right;font-size:22px;opacity:0.45;margin-top:auto">✏️</div>
-    </div>
+    <!-- ── Up arrow left column (NETWORK feeds back to STRATEGY) ── -->
+    <line x1="82" y1="496" x2="82" y2="302"
+          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
 
-    <!-- ROW 2: arrows -->
-    <div class="arr-ul" style="grid-column:1;grid-row:2">
-      <svg width="22" height="48" viewBox="0 0 22 48" fill="none">
-        <line x1="11" y1="46" x2="11" y2="8" stroke="#111" stroke-width="2.5"/>
-        <polygon points="6,8 11,0 16,8" fill="#111"/>
-      </svg>
-    </div>
+    <!-- ── ENGAGEMENT → ANALYTICS (diagonal right-down) ── -->
+    <line x1="488" y1="420" x2="508" y2="498"
+          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
 
-    <div class="arr-mid" style="grid-column:2;grid-row:2">
-      <svg width="40" height="36" viewBox="0 0 40 36" fill="none">
-        <line x1="4" y1="8"  x2="36" y2="8"  stroke="#111" stroke-width="1.4" stroke-dasharray="4,3"/>
-        <line x1="4" y1="18" x2="28" y2="18" stroke="#111" stroke-width="1.4" stroke-dasharray="4,3"/>
-        <line x1="4" y1="28" x2="18" y2="28" stroke="#111" stroke-width="1.4" stroke-dasharray="4,3"/>
-      </svg>
-    </div>
+    <!-- ── CONTENT → ANALYTICS (down) ── -->
+    <line x1="625" y1="296" x2="625" y2="494"
+          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
 
-    <div class="arr-dr" style="grid-column:3;grid-row:2">
-      <svg width="22" height="48" viewBox="0 0 22 48" fill="none">
-        <line x1="11" y1="2" x2="11" y2="40" stroke="#111" stroke-width="2.5"/>
-        <polygon points="6,40 11,48 16,40" fill="#111"/>
-      </svg>
-    </div>
+    <!-- ── ENGAGEMENT → down to bottom deco ── -->
+    <line x1="372" y1="488" x2="372" y2="656"
+          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
 
-    <!-- ROW 3 -->
-    <div class="box" style="grid-column:1;grid-row:3">
-      <div class="box-label">{{ box3.label }}</div>
-      <ul class="box-pts">{% for p in box3.points %}<li>{{ p }}</li>{% endfor %}</ul>
-    </div>
+    <!-- ── Lightbulb icon at center (358,196) ── -->
+    <g transform="translate(334,178)" filter="url(#rgh)">
+      <!-- bulb -->
+      <path d="M24 42 C8 36 4 20 4 16 C4 4 12 0 24 0 C36 0 44 4 44 16 C44 20 40 36 24 42Z"
+            stroke="#1a1a1a" stroke-width="2.4" fill="none"/>
+      <!-- base lines -->
+      <line x1="15" y1="44" x2="33" y2="44" stroke="#1a1a1a" stroke-width="2.2"/>
+      <line x1="17" y1="50" x2="31" y2="50" stroke="#1a1a1a" stroke-width="2.2"/>
+      <path d="M20 56 Q24 62 28 56" stroke="#1a1a1a" stroke-width="2.2" fill="none"/>
+      <!-- shine rays -->
+      <line x1="24" y1="-4"  x2="24" y2="-12" stroke="#1a1a1a" stroke-width="2"/>
+      <line x1="6"  y1="6"   x2="0"  y2="0"   stroke="#1a1a1a" stroke-width="2"/>
+      <line x1="42" y1="6"   x2="48" y2="0"   stroke="#1a1a1a" stroke-width="2"/>
+    </g>
 
-    <div style="grid-column:2;grid-row:3">
-      <div class="box-c">
-        <div class="box-label" style="font-size:15px;text-align:center">{{ box4.label }}</div>
-        <ul class="box-pts">{% for p in box4.points %}<li style="font-size:12.5px">{{ p }}</li>{% endfor %}</ul>
+    <!-- ── Growth bar chart (top-right) ── -->
+    <g transform="translate(700,14)" filter="url(#rgh)">
+      <rect x="0"  y="52" width="14" height="14" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+      <rect x="18" y="40" width="14" height="26" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+      <rect x="36" y="26" width="14" height="40" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+      <rect x="54" y="12" width="14" height="54" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+      <rect x="72" y="0"  width="14" height="66" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+      <path d="M4 55 Q38 22 88 6" stroke="#1a1a1a" stroke-width="2.8" fill="none" marker-end="url(#arr)"/>
+    </g>
+
+    <!-- ── Pencil decoration (right side, between CONTENT and ANALYTICS) ── -->
+    <g transform="translate(762,340) rotate(18)" filter="url(#rgh)">
+      <rect x="0" y="0" width="14" height="65" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+      <polygon points="0,65 14,65 7,80" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+      <line x1="0" y1="10" x2="14" y2="10" stroke="#1a1a1a" stroke-width="2"/>
+      <rect x="0" y="0" width="14" height="10" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+    </g>
+
+    <!-- ── Deco lines bottom-left ── -->
+    <g transform="translate(18,700)" filter="url(#rgh)">
+      <line x1="0" y1="0"  x2="60" y2="0"  stroke="#1a1a1a" stroke-width="2.5"/>
+      <line x1="0" y1="11" x2="46" y2="11" stroke="#1a1a1a" stroke-width="2.5"/>
+      <line x1="0" y1="22" x2="32" y2="22" stroke="#1a1a1a" stroke-width="2.5"/>
+    </g>
+
+    <!-- ── Mini growth chart (center-bottom) ── -->
+    <g transform="translate(290,662)" filter="url(#rgh)">
+      <line x1="0" y1="56" x2="144" y2="56" stroke="#1a1a1a" stroke-width="1.8"/>
+      <line x1="0" y1="56" x2="0"   y2="0"  stroke="#1a1a1a" stroke-width="1.8"/>
+      <polyline points="5,52 28,40 52,44 78,26 106,28 136,10"
+                stroke="#1a1a1a" stroke-width="2.2" fill="none"/>
+      <polygon points="136,10 132,18 140,18" fill="#1a1a1a"/>
+    </g>
+
+    <!-- ── Mini growth chart (right-bottom) ── -->
+    <g transform="translate(510,662)" filter="url(#rgh)">
+      <line x1="0" y1="56" x2="130" y2="56" stroke="#1a1a1a" stroke-width="1.8"/>
+      <line x1="0" y1="56" x2="0"   y2="0"  stroke="#1a1a1a" stroke-width="1.8"/>
+      <polyline points="5,52 30,34 58,38 86,18 118,8"
+                stroke="#1a1a1a" stroke-width="2.2" fill="none"/>
+      <polygon points="118,8 114,16 122,16" fill="#1a1a1a"/>
+    </g>
+
+    <!-- ── Deco lines bottom-right ── -->
+    <g transform="translate(724,700)" filter="url(#rgh)">
+      <line x1="0" y1="0"  x2="-60" y2="0"  stroke="#1a1a1a" stroke-width="2.5"/>
+      <line x1="0" y1="11" x2="-46" y2="11" stroke="#1a1a1a" stroke-width="2.5"/>
+      <line x1="0" y1="22" x2="-32" y2="22" stroke="#1a1a1a" stroke-width="2.5"/>
+    </g>
+
+  </svg>
+
+  <!-- ── HTML text content ── -->
+  <div class="content">
+
+    <!-- Header -->
+    <div style="position:absolute;left:18px;top:18px;display:flex;align-items:center;gap:16px">
+      <div class="logo-box">in</div>
+      <div>
+        <div style="font-size:44px;font-weight:700;color:#1a1a1a;line-height:1.0;letter-spacing:0.3px">{{ title_line1 }}</div>
+        <div style="font-size:44px;font-weight:700;color:#1a1a1a;line-height:1.0;letter-spacing:0.3px">{{ title_line2 }}</div>
       </div>
     </div>
 
-    <div class="box" style="grid-column:3;grid-row:3">
-      <div class="box-label">{{ box5.label }}</div>
-      <ul class="box-pts">{% for p in box5.points %}<li>{{ p }}</li>{% endfor %}</ul>
+    <!-- TOP-LEFT: box1 -->
+    <div class="node" style="left:18px;top:148px">
+      <div class="node-label">{{ box1.label }}</div>
+      <ul class="node-pts">{% for p in box1.points %}<li>{{ p }}</li>{% endfor %}</ul>
+    </div>
+
+    <!-- TOP-RIGHT: box2 -->
+    <div class="node" style="left:500px;top:148px">
+      <div class="node-label">{{ box2.label }}</div>
+      <ul class="node-pts">{% for p in box2.points %}<li>{{ p }}</li>{% endfor %}</ul>
+    </div>
+
+    <!-- CENTER: box4 (ENGAGEMENT-equivalent) -->
+    <div class="node" style="left:268px;top:338px">
+      <div class="node-label">{{ box4.label }}</div>
+      <ul class="node-pts">{% for p in box4.points %}<li>{{ p }}</li>{% endfor %}</ul>
+    </div>
+
+    <!-- BOTTOM-LEFT: box3 -->
+    <div class="node" style="left:18px;top:500px">
+      <div class="node-label">{{ box3.label }}</div>
+      <ul class="node-pts">{% for p in box3.points %}<li>{{ p }}</li>{% endfor %}</ul>
+    </div>
+
+    <!-- BOTTOM-RIGHT: box5 -->
+    <div class="node" style="left:500px;top:500px">
+      <div class="node-label">{{ box5.label }}</div>
+      <ul class="node-pts">{% for p in box5.points %}<li>{{ p }}</li>{% endfor %}</ul>
+    </div>
+
+    <!-- Footer -->
+    <div style="position:absolute;bottom:16px;right:18px;display:flex;align-items:center;gap:8px">
+      <div class="fi"></div>
+      <span class="handle">{{ handle }}</span>
     </div>
 
   </div>
-
-  <!-- Bottom deco -->
-  <div class="deco-row">
-    <div class="lines">
-      <div class="ln" style="width:54px"></div>
-      <div class="ln" style="width:42px"></div>
-      <div class="ln" style="width:30px"></div>
-    </div>
-    <svg width="74" height="34" viewBox="0 0 74 34" fill="none">
-      <polyline points="4,30 14,22 26,26 38,14 52,18 70,4" stroke="#111" stroke-width="2" stroke-linejoin="round"/>
-      <polygon points="70,4 63,7 65,13" fill="#111"/>
-    </svg>
-    <svg width="60" height="34" viewBox="0 0 60 34" fill="none">
-      <polyline points="4,28 14,20 26,24 38,12 52,6" stroke="#111" stroke-width="2" stroke-linejoin="round"/>
-      <polygon points="52,6 45,9 47,15" fill="#111"/>
-    </svg>
-    <div class="lines">
-      <div class="ln" style="width:30px"></div>
-      <div class="ln" style="width:42px"></div>
-      <div class="ln" style="width:54px"></div>
-    </div>
-  </div>
-
-  <!-- Quote -->
-  <div class="quote">{{ quote }}</div>
-
-  <!-- Footer -->
-  <div class="footer">
-    <div class="fi"></div>
-    <div class="handle">{{ handle }}</div>
-  </div>
-
-  <!-- Pencil deco -->
-  <div class="pencil">✏️</div>
 
 </div>
 
 <script>
-// Auto-fit: shrink box-label if it overflows
-document.querySelectorAll('.box-label').forEach(el => {
-  let size = parseFloat(getComputedStyle(el).fontSize);
-  while (el.scrollWidth > el.parentElement.clientWidth - 26 && size > 12) {
-    size -= 1;
-    el.style.fontSize = size + 'px';
+document.querySelectorAll('.node-label').forEach(el => {
+  let sz = parseFloat(getComputedStyle(el).fontSize);
+  while (el.scrollWidth > el.parentElement.clientWidth - 4 && sz > 14) {
+    sz -= 1; el.style.fontSize = sz + 'px';
   }
 });
-// Auto-fit: shrink quote if it overflows
-const q = document.querySelector('.quote');
-let qs = parseFloat(getComputedStyle(q).fontSize);
-while (q.scrollHeight > 72 && qs > 12) {
-  qs -= 0.5;
-  q.style.fontSize = qs + 'px';
-}
 </script>
 </body>
 </html>
