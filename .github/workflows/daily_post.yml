@@ -24,12 +24,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Generate and schedule post
+      - name: Generate and post to LinkedIn
         run: python scripts/generate_and_schedule.py
         env:
-          GEMINI_API_KEY:    ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_API_KEY_2:  ${{ secrets.GEMINI_API_KEY_2 }}
-          EURON_API_KEY:     ${{ secrets.EURON_API_KEY }}
-          EXA_API_KEY:       ${{ secrets.EXA_API_KEY }}
-          BUFFER_API_KEY:    ${{ secrets.BUFFER_API_KEY }}
-          BUFFER_CHANNEL_ID: ${{ secrets.BUFFER_CHANNEL_ID }}
+          GEMINI_API_KEY:         ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY_2:       ${{ secrets.GEMINI_API_KEY_2 }}
+          EURON_API_KEY:          ${{ secrets.EURON_API_KEY }}
+          EXA_API_KEY:            ${{ secrets.EXA_API_KEY }}
+          LINKEDIN_ACCESS_TOKEN:  ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_PERSON_ID:     ${{ secrets.LINKEDIN_PERSON_ID }}

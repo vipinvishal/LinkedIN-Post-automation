@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 LinkedIn Post Agent
-Pipeline: Exa (research) → Gemini (generate viral post) → Buffer (schedule to LinkedIn)
+Pipeline: Exa (research) → Gemini (generate viral post) → LinkedIn API (post directly)
 
 Run locally : python scripts/generate_and_schedule.py
 GitHub Actions triggers this automatically every day at 10 AM IST.
@@ -12,7 +12,7 @@ import json
 import random
 import time
 import requests
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from exa_py import Exa
 from google import genai
 from google.genai import types
@@ -23,12 +23,12 @@ load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env
 load_dotenv()
 
 # ── API Keys ──────────────────────────────────────────────────────────────────
-GEMINI_API_KEY    = os.environ.get("GEMINI_API_KEY")
-GEMINI_API_KEY_2  = os.environ.get("GEMINI_API_KEY_2")
-EURON_API_KEY     = os.environ.get("EURON_API_KEY")
-EXA_API_KEY       = os.environ.get("EXA_API_KEY")
-BUFFER_API_KEY    = os.environ.get("BUFFER_API_KEY")
-BUFFER_CHANNEL_ID = os.environ.get("BUFFER_CHANNEL_ID")
+GEMINI_API_KEY        = os.environ.get("GEMINI_API_KEY")
+GEMINI_API_KEY_2      = os.environ.get("GEMINI_API_KEY_2")
+EURON_API_KEY         = os.environ.get("EURON_API_KEY")
+EXA_API_KEY           = os.environ.get("EXA_API_KEY")
+LINKEDIN_ACCESS_TOKEN = os.environ.get("LINKEDIN_ACCESS_TOKEN")
+LINKEDIN_PERSON_ID    = os.environ.get("LINKEDIN_PERSON_ID")
 
 GEMINI_MODEL           = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
 GEMINI_FALLBACK_MODELS = ["gemini-2.0-flash", "gemini-2.0-flash-001"]
@@ -368,157 +368,81 @@ def generate_post(topic: str, tone: str, niche: str, persona: str, research: str
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# STEP 3 — Schedule to Buffer
+# STEP 3 — Post directly to LinkedIn
 # ══════════════════════════════════════════════════════════════════════════════
 
-class BufferRateLimitError(Exception):
-    """Raised when Buffer API returns a rate limit error that cannot be retried within the run."""
+def post_to_linkedin(post_text: str) -> str:
+    """Publish the post directly to LinkedIn via the REST Posts API."""
+    print("[ Step 3 ] Posting to LinkedIn...")
 
-
-def _validate_buffer_channel():
-    """Verify BUFFER_CHANNEL_ID is a LinkedIn channel before posting."""
-    query = """
-    query {
-      account {
-        channels {
-          id
-          service
-        }
-      }
-    }
-    """
-    try:
-        resp = requests.post(
-            "https://api.buffer.com",
-            headers={"Content-Type": "application/json", "Authorization": f"Bearer {BUFFER_API_KEY}"},
-            json={"query": query},
-            timeout=15,
+    if not LINKEDIN_ACCESS_TOKEN:
+        raise RuntimeError(
+            "LINKEDIN_ACCESS_TOKEN is not set.\n"
+            "  Run: python scripts/get_linkedin_token.py\n"
+            "  Then add LINKEDIN_ACCESS_TOKEN to .env and GitHub secrets."
         )
-        data = resp.json()
-        if "errors" in data:
-            return  # can't validate — let the post attempt surface the real error
-        channels = data.get("data", {}).get("account", {}).get("channels", [])
-        for ch in channels:
-            if ch.get("id") == BUFFER_CHANNEL_ID:
-                service = ch.get("service", "").lower()
-                if "linkedin" not in service:
-                    raise RuntimeError(
-                        f"BUFFER_CHANNEL_ID is a '{ch.get('service', 'unknown')}' channel, not LinkedIn.\n"
-                        "  Fix: run  python scripts/get_buffer_channel.py  to list your channels,\n"
-                        "  then update BUFFER_CHANNEL_ID in .env and in your GitHub secret."
-                    )
-                return
-        print(f"  [warn] BUFFER_CHANNEL_ID not found among your Buffer channels — double-check the ID.")
-    except RuntimeError:
-        raise
-    except Exception:
-        pass  # network / parse errors — don't block the run
+    if not LINKEDIN_PERSON_ID:
+        raise RuntimeError(
+            "LINKEDIN_PERSON_ID is not set.\n"
+            "  Run: python scripts/get_linkedin_token.py\n"
+            "  Then add LINKEDIN_PERSON_ID to .env and GitHub secrets."
+        )
 
+    author_urn = f"urn:li:person:{LINKEDIN_PERSON_ID}"
 
-def _is_buffer_rate_limit(data: dict) -> bool:
-    """Return True if the Buffer GraphQL response indicates a rate limit error."""
-    errors = data.get("errors")
-    if not errors:
-        return False
-    raw = str(errors).lower()
-    return "rate_limit_exceeded" in raw or "too many requests" in raw
-
-
-def schedule_to_buffer(post_text: str) -> str:
-    """Push the post to Buffer via GraphQL. Schedules 5 minutes from now."""
-    print("[ Step 3 ] Scheduling to Buffer...")
-    _validate_buffer_channel()
-
-    due_at = (datetime.now(timezone.utc) + timedelta(minutes=5)).isoformat()
-
-    mutation = """
-    mutation CreatePost($text: String!, $channelId: ChannelId!, $dueAt: DateTime) {
-      createPost(input: {
-        text: $text,
-        channelId: $channelId,
-        schedulingType: automatic,
-        mode: customScheduled,
-        dueAt: $dueAt
-      }) {
-        ... on PostActionSuccess {
-          post {
-            id
-            text
-          }
-        }
-        ... on MutationError {
-          message
-        }
-      }
+    payload = {
+        "author":        author_urn,
+        "commentary":    post_text,
+        "visibility":    "PUBLIC",
+        "distribution":  {
+            "feedDistribution":           "MAIN_FEED",
+            "targetEntities":             [],
+            "thirdPartyDistributionChannels": [],
+        },
+        "lifecycleState":             "PUBLISHED",
+        "isReshareDisabledByAuthor":  False,
     }
-    """
 
     for attempt in range(1, MAX_RETRIES + 1):
         response = requests.post(
-            "https://api.buffer.com",
+            "https://api.linkedin.com/rest/posts",
             headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {BUFFER_API_KEY}",
+                "Authorization":              f"Bearer {LINKEDIN_ACCESS_TOKEN}",
+                "Content-Type":               "application/json",
+                "LinkedIn-Version":           "202406",
+                "X-Restli-Protocol-Version":  "2.0.0",
             },
-            json={
-                "query": mutation,
-                "variables": {
-                    "text": post_text,
-                    "channelId": BUFFER_CHANNEL_ID,
-                    "dueAt": due_at,
-                },
-            },
+            json=payload,
             timeout=15,
         )
 
+        if response.status_code == 201:
+            post_id = response.headers.get("x-restli-id", "unknown")
+            print(f"  Published! LinkedIn Post ID: {post_id}\n")
+            return post_id
+
         if response.status_code == 429:
-            retry_after = response.headers.get("Retry-After")
-            wait_seconds = int(retry_after) if retry_after and retry_after.isdigit() else RETRY_BASE_SECONDS * attempt
-            print(f"  Buffer HTTP 429 rate limit. Waiting {wait_seconds}s before retry {attempt}/{MAX_RETRIES}...")
+            wait_seconds = RETRY_BASE_SECONDS * attempt
+            print(f"  LinkedIn 429 rate limit, attempt {attempt}/{MAX_RETRIES}. Waiting {wait_seconds}s...")
             if attempt == MAX_RETRIES:
-                raise BufferRateLimitError("Buffer rate limit (HTTP 429). The 15-minute window has not cleared.")
+                raise RuntimeError("LinkedIn rate limit — too many requests. Try again tomorrow.")
             time.sleep(wait_seconds)
             continue
 
-        try:
-            data = response.json()
-        except ValueError:
-            raise RuntimeError(f"Buffer API error: invalid JSON response (status {response.status_code})")
-
-        if _is_buffer_rate_limit(data):
-            errors = data.get("errors", [])
-            # Extract the window duration from extensions if available
-            window = "15m"
-            if isinstance(errors, list) and errors:
-                ext = errors[0].get("extensions", {})
-                window = ext.get("window", window)
-            print(f"  Buffer GraphQL rate limit (window: {window}), attempt {attempt}/{MAX_RETRIES}.")
-            if attempt < MAX_RETRIES:
-                wait_seconds = RETRY_BASE_SECONDS * attempt
-                print(f"  Waiting {wait_seconds}s before retry...")
-                time.sleep(wait_seconds)
-                continue
-            raise BufferRateLimitError(
-                f"Buffer rate limit exceeded (window: {window}). "
-                "Too many requests were made in a short period — likely from multiple workflow triggers. "
-                "The post will be skipped today and retried tomorrow."
+        if response.status_code == 401:
+            raise RuntimeError(
+                "LinkedIn access token is invalid or expired.\n"
+                "  Run: python scripts/get_linkedin_token.py\n"
+                "  Then update LINKEDIN_ACCESS_TOKEN in .env and GitHub secrets."
             )
 
-        if "errors" in data:
-            errors = data["errors"]
-            message = errors[0].get("message") if isinstance(errors, list) and errors else str(errors)
-            raise RuntimeError(f"Buffer API error: {message}")
+        try:
+            err = response.json()
+        except ValueError:
+            err = response.text
+        raise RuntimeError(f"LinkedIn API error {response.status_code}: {err}")
 
-        result = data.get("data", {}).get("createPost", {})
-        if "message" in result:
-            raise RuntimeError(f"Buffer mutation error: {result['message']}")
-
-        post_id = result.get("post", {}).get("id", "unknown")
-        print(f"  Scheduled! Buffer Post ID: {post_id}")
-        print(f"  Publish time : {due_at}\n")
-        return post_id
-
-    raise RuntimeError("Buffer API error: exhausted retry attempts.")
+    raise RuntimeError("LinkedIn API: exhausted retry attempts.")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -545,26 +469,18 @@ def main(preview: bool = False):
 
         if preview:
             print(f"{'='*60}")
-            print(f"  PREVIEW ONLY — post NOT sent to Buffer.")
-            print(f"  Run without --preview to schedule it.")
+            print(f"  PREVIEW ONLY — post NOT published to LinkedIn.")
+            print(f"  Run without --preview to publish it.")
             print(f"{'='*60}\n")
             return
 
         validate_post_length(post, PLATFORM)
-        post_id = schedule_to_buffer(post)
+        post_id = post_to_linkedin(post)
 
         print(f"{'='*60}")
-        print(f"  Done! Post queued in Buffer → will publish to LinkedIn")
-        print(f"  Buffer ID : {post_id}")
+        print(f"  Done! Post published directly to LinkedIn.")
+        print(f"  LinkedIn Post ID : {post_id}")
         print(f"{'='*60}\n")
-
-    except BufferRateLimitError as e:
-        # Buffer rate limit during a daily run — skip gracefully rather than failing the workflow.
-        # Retrying within the 15-minute window will not help, and the post is already missed for today.
-        print(f"\n  WARNING: {e}")
-        print(f"  Tip: avoid triggering the workflow manually and via schedule on the same day.")
-        print(f"  Exiting with code 0 — workflow will NOT be marked as failed.\n")
-        raise SystemExit(0)
 
     except Exception as e:
         print(f"\n  ERROR: {e}")
