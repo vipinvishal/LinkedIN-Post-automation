@@ -9,211 +9,156 @@
   body { width: 900px; overflow: hidden; }
 
   .page {
-    width: 900px;
-    height: 900px;
-    background-color: #f3ead4;
+    width: 900px; height: 900px;
+    background-color: #f2ead4;
     background-image: repeating-linear-gradient(
-      to bottom,
-      transparent 0px, transparent 28px,
-      #adc8e0 28px, #adc8e0 29px
+      to bottom, transparent 0px, transparent 29px,
+      #acc6de 29px, #acc6de 30px
     );
     font-family: 'Caveat', cursive;
-    position: relative;
-    overflow: hidden;
-    border: 5px solid #1a1210;
+    position: relative; overflow: hidden;
+    border: 6px solid #18100a;
   }
 
-  /* spiral rings column */
+  /* ── rings ── */
   .rings-col {
     position: absolute; left: 0; top: 0; bottom: 0; width: 56px;
-    background: #ece2c2;
-    border-right: 3px solid #2a1e1e;
-    z-index: 3;
+    background: #ece0bf; border-right: 3px solid #2a1a14; z-index: 3;
   }
   .ring {
-    position: absolute; left: 8px;
-    width: 40px; height: 22px;
-    border: 3.5px solid #2a1e1e;
-    border-radius: 50%;
-    border-bottom-color: transparent;
-    border-left-color: transparent;
+    position: absolute; left: 8px; width: 40px; height: 23px;
+    border: 4px solid #2a1a14; border-radius: 50%;
+    border-bottom-color: transparent; border-left-color: transparent;
     transform: rotate(-20deg);
   }
 
-  /* content starts after rings */
-  .content {
-    position: absolute; left: 56px; top: 0; right: 0; bottom: 0;
-  }
+  /* ── main content area starts after rings ── */
+  .content { position: absolute; left: 56px; top: 0; right: 0; bottom: 0; }
 
-  /* logo box */
-  .logo-box {
-    border: 3.5px solid #1a1a1a;
-    width: 58px; height: 58px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 26px; font-weight: 700; color: #1a1a1a;
-    flex-shrink: 0; letter-spacing: -1px;
-  }
-
-  /* node label (box with border) */
+  /* ── node label box ── */
   .node-label {
     display: inline-block;
-    border: 3.5px solid #1a1a1a;
-    padding: 5px 16px 4px 16px;
-    font-size: 26px; font-weight: 700; color: #1a1a1a;
-    letter-spacing: 0.5px;
-    background: rgba(243,234,212,0.6);
+    border: 3.5px solid #1a1010;
+    padding: 5px 16px;
+    font-size: 36px; font-weight: 700; color: #1a1010;
+    letter-spacing: 0.3px;
+    background: rgba(242,234,212,0.6);
   }
 
-  /* bullet points outside the box */
-  .node-pts {
-    list-style: none;
-    margin-top: 8px;
-    margin-left: 5px;
-  }
-  .node-pts li {
-    font-size: 21px;
-    color: #1a1a1a;
-    line-height: 1.5;
-  }
+  /* ── bullet points (outside the label box) ── */
+  .node-pts { list-style: none; margin-top: 9px; margin-left: 5px; }
+  .node-pts li { font-size: 28px; color: #1a1010; line-height: 1.4; }
   .node-pts li::before { content: "• "; }
 
-  /* each node is absolutely positioned */
+  /* ── each node is absolutely positioned ── */
   .node { position: absolute; }
 
-  /* handle footer */
-  .handle { font-size: 20px; color: #555; font-style: italic; }
+  /* ── footer ── */
   .fi {
-    width: 27px; height: 27px; border: 2.5px solid #555;
-    border-radius: 7px; position: relative; flex-shrink: 0;
+    width: 30px; height: 30px; border: 3px solid #555;
+    border-radius: 8px; position: relative; flex-shrink: 0;
   }
   .fi::before {
     content: ''; position: absolute; left: 50%; top: 50%;
     transform: translate(-50%,-50%);
-    width: 12px; height: 12px; border: 2px solid #555; border-radius: 50%;
+    width: 14px; height: 14px; border: 2.5px solid #555; border-radius: 50%;
   }
   .fi::after {
-    content: ''; position: absolute; right: 4px; top: 4px;
-    width: 3px; height: 3px; background: #555; border-radius: 50%;
+    content: ''; position: absolute; right: 5px; top: 5px;
+    width: 4px; height: 4px; background: #555; border-radius: 50%;
   }
 </style>
 </head>
 <body>
 <div class="page">
 
-  <!-- Rings -->
+  <!-- Rings column -->
   <div class="rings-col">
-    {% for i in range(14) %}<div class="ring" style="top:{{ 18 + i*62 }}px"></div>{% endfor %}
+    {% for i in range(14) %}<div class="ring" style="top:{{ 16 + i*62 }}px"></div>{% endfor %}
   </div>
 
-  <!-- SVG overlay: all arrows, icons, decorations -->
-  <!-- coordinate origin = page x=56 (same as .content left) -->
-  <svg style="position:absolute;left:56px;top:0;pointer-events:none;overflow:visible"
+  <!--
+    SVG overlay — coordinates: x=0 == page-x=56 (rings edge)
+    Arrows are injected by JS after fonts load.
+    Static decorations: bar chart, pencil, dashed lines.
+    Dynamic decorations: lightbulb, 3 bottom charts — initially hidden, positioned by JS.
+  -->
+  <svg id="isvg"
+       style="position:absolute;left:56px;top:0;pointer-events:none;overflow:visible;z-index:4"
        width="844" height="900" viewBox="0 0 844 900">
     <defs>
-      <filter id="rgh" x="-6%" y="-12%" width="112%" height="124%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="n" seed="5"/>
-        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+      <filter id="rgh" x="-8%" y="-15%" width="116%" height="130%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.038" numOctaves="3" result="n" seed="7"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
       </filter>
-      <marker id="arr" markerWidth="12" markerHeight="8" refX="10" refY="4" orient="auto">
-        <polygon points="0 0.5, 10 4, 0 7.5" fill="#1a1a1a"/>
+      <marker id="arr" markerWidth="14" markerHeight="9" refX="11" refY="4.5" orient="auto">
+        <polygon points="0 0.5, 12 4.5, 0 8.5" fill="#1a1010"/>
       </marker>
     </defs>
 
-    <!-- ── Long horizontal arrow under header ── -->
-    <line x1="20" y1="136" x2="806" y2="136"
-          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
-
-    <!-- ── STRATEGY → lightbulb ── -->
-    <line x1="208" y1="172" x2="345" y2="212"
-          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
-
-    <!-- ── Lightbulb → ENGAGEMENT (center node) ── -->
-    <line x1="372" y1="256" x2="372" y2="336"
-          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
-
-    <!-- ── NETWORK → ENGAGEMENT (diagonal up-right) ── -->
-    <line x1="196" y1="528" x2="284" y2="432"
-          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
-
-    <!-- ── Up arrow left column (NETWORK feeds back to STRATEGY) ── -->
-    <line x1="82" y1="496" x2="82" y2="302"
-          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
-
-    <!-- ── ENGAGEMENT → ANALYTICS (diagonal right-down) ── -->
-    <line x1="488" y1="420" x2="508" y2="498"
-          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
-
-    <!-- ── CONTENT → ANALYTICS (down) ── -->
-    <line x1="625" y1="296" x2="625" y2="494"
-          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
-
-    <!-- ── ENGAGEMENT → down to bottom deco ── -->
-    <line x1="372" y1="488" x2="372" y2="656"
-          stroke="#1a1a1a" stroke-width="2.5" marker-end="url(#arr)" filter="url(#rgh)"/>
-
-    <!-- ── Lightbulb icon at center (358,196) ── -->
-    <g transform="translate(334,178)" filter="url(#rgh)">
-      <!-- bulb -->
-      <path d="M24 42 C8 36 4 20 4 16 C4 4 12 0 24 0 C36 0 44 4 44 16 C44 20 40 36 24 42Z"
-            stroke="#1a1a1a" stroke-width="2.4" fill="none"/>
-      <!-- base lines -->
-      <line x1="15" y1="44" x2="33" y2="44" stroke="#1a1a1a" stroke-width="2.2"/>
-      <line x1="17" y1="50" x2="31" y2="50" stroke="#1a1a1a" stroke-width="2.2"/>
-      <path d="M20 56 Q24 62 28 56" stroke="#1a1a1a" stroke-width="2.2" fill="none"/>
-      <!-- shine rays -->
-      <line x1="24" y1="-4"  x2="24" y2="-12" stroke="#1a1a1a" stroke-width="2"/>
-      <line x1="6"  y1="6"   x2="0"  y2="0"   stroke="#1a1a1a" stroke-width="2"/>
-      <line x1="42" y1="6"   x2="48" y2="0"   stroke="#1a1a1a" stroke-width="2"/>
+    <!-- ── Bar chart (top-right, always fixed) ── -->
+    <g transform="translate(648,14)" filter="url(#rgh)">
+      <rect x="0"  y="58" width="16" height="18" stroke="#1a1010" stroke-width="2.4" fill="none"/>
+      <rect x="20" y="44" width="16" height="32" stroke="#1a1010" stroke-width="2.4" fill="none"/>
+      <rect x="40" y="30" width="16" height="46" stroke="#1a1010" stroke-width="2.4" fill="none"/>
+      <rect x="60" y="16" width="16" height="60" stroke="#1a1010" stroke-width="2.4" fill="none"/>
+      <rect x="80" y="2"  width="16" height="74" stroke="#1a1010" stroke-width="2.4" fill="none"/>
+      <path d="M4 64 Q46 30 102 4" stroke="#1a1010" stroke-width="3" fill="none" marker-end="url(#arr)"/>
     </g>
 
-    <!-- ── Growth bar chart (top-right) ── -->
-    <g transform="translate(700,14)" filter="url(#rgh)">
-      <rect x="0"  y="52" width="14" height="14" stroke="#1a1a1a" stroke-width="2" fill="none"/>
-      <rect x="18" y="40" width="14" height="26" stroke="#1a1a1a" stroke-width="2" fill="none"/>
-      <rect x="36" y="26" width="14" height="40" stroke="#1a1a1a" stroke-width="2" fill="none"/>
-      <rect x="54" y="12" width="14" height="54" stroke="#1a1a1a" stroke-width="2" fill="none"/>
-      <rect x="72" y="0"  width="14" height="66" stroke="#1a1a1a" stroke-width="2" fill="none"/>
-      <path d="M4 55 Q38 22 88 6" stroke="#1a1a1a" stroke-width="2.8" fill="none" marker-end="url(#arr)"/>
+    <!-- ── Pencil (right side, between top and bottom row) ── -->
+    <g id="pencil-g" transform="translate(0,0)" filter="url(#rgh)">
+      <!-- will be repositioned by JS -->
     </g>
 
-    <!-- ── Pencil decoration (right side, between CONTENT and ANALYTICS) ── -->
-    <g transform="translate(762,340) rotate(18)" filter="url(#rgh)">
-      <rect x="0" y="0" width="14" height="65" stroke="#1a1a1a" stroke-width="2" fill="none"/>
-      <polygon points="0,65 14,65 7,80" stroke="#1a1a1a" stroke-width="2" fill="none"/>
-      <line x1="0" y1="10" x2="14" y2="10" stroke="#1a1a1a" stroke-width="2"/>
-      <rect x="0" y="0" width="14" height="10" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+    <!-- ── Dashed lines (right column, between CONTENT and ANALYTICS) ── -->
+    <g id="dash-g" transform="translate(0,0)" opacity="0">
+      <line x1="0" y1="0"  x2="42" y2="0"  stroke="#1a1010" stroke-width="2.2" stroke-dasharray="6,4"/>
+      <line x1="0" y1="12" x2="34" y2="12" stroke="#1a1010" stroke-width="2.2" stroke-dasharray="6,4"/>
+      <line x1="0" y1="24" x2="24" y2="24" stroke="#1a1010" stroke-width="2.2" stroke-dasharray="6,4"/>
     </g>
 
-    <!-- ── Deco lines bottom-left ── -->
-    <g transform="translate(18,700)" filter="url(#rgh)">
-      <line x1="0" y1="0"  x2="60" y2="0"  stroke="#1a1a1a" stroke-width="2.5"/>
-      <line x1="0" y1="11" x2="46" y2="11" stroke="#1a1a1a" stroke-width="2.5"/>
-      <line x1="0" y1="22" x2="32" y2="22" stroke="#1a1a1a" stroke-width="2.5"/>
+    <!-- ── Lightbulb (repositioned by JS) ── -->
+    <g id="lb" transform="translate(-200,-200)" filter="url(#rgh)">
+      <path d="M26 52 C8 44 2 30 2 20 C2 6 12 0 26 0 C40 0 50 6 50 20 C50 30 44 44 26 52Z"
+            stroke="#1a1010" stroke-width="2.8" fill="none"/>
+      <line x1="16" y1="55" x2="36" y2="55" stroke="#1a1010" stroke-width="2.6"/>
+      <line x1="18" y1="62" x2="34" y2="62" stroke="#1a1010" stroke-width="2.6"/>
+      <path d="M22 70 Q26 78 30 70" stroke="#1a1010" stroke-width="2.6" fill="none"/>
+      <line x1="26" y1="-5"  x2="26" y2="-14" stroke="#1a1010" stroke-width="2.2"/>
+      <line x1="8"  y1="7"   x2="2"  y2="0"   stroke="#1a1010" stroke-width="2.2"/>
+      <line x1="44" y1="7"   x2="50" y2="0"   stroke="#1a1010" stroke-width="2.2"/>
     </g>
 
-    <!-- ── Mini growth chart (center-bottom) ── -->
-    <g transform="translate(290,662)" filter="url(#rgh)">
-      <line x1="0" y1="56" x2="144" y2="56" stroke="#1a1a1a" stroke-width="1.8"/>
-      <line x1="0" y1="56" x2="0"   y2="0"  stroke="#1a1a1a" stroke-width="1.8"/>
-      <polyline points="5,52 28,40 52,44 78,26 106,28 136,10"
-                stroke="#1a1a1a" stroke-width="2.2" fill="none"/>
-      <polygon points="136,10 132,18 140,18" fill="#1a1a1a"/>
+    <!-- ── Pencil icon (repositioned by JS) ── -->
+    <g id="pencil" transform="translate(-200,-200)" filter="url(#rgh)">
+      <rect x="0" y="0"  width="16" height="10" stroke="#1a1010" stroke-width="2.2" fill="none"/>
+      <rect x="0" y="10" width="16" height="68" stroke="#1a1010" stroke-width="2.2" fill="none"/>
+      <polygon points="0,78 16,78 8,96" stroke="#1a1010" stroke-width="2.2" fill="none"/>
     </g>
 
-    <!-- ── Mini growth chart (right-bottom) ── -->
-    <g transform="translate(510,662)" filter="url(#rgh)">
-      <line x1="0" y1="56" x2="130" y2="56" stroke="#1a1a1a" stroke-width="1.8"/>
-      <line x1="0" y1="56" x2="0"   y2="0"  stroke="#1a1a1a" stroke-width="1.8"/>
-      <polyline points="5,52 30,34 58,38 86,18 118,8"
-                stroke="#1a1a1a" stroke-width="2.2" fill="none"/>
-      <polygon points="118,8 114,16 122,16" fill="#1a1a1a"/>
+    <!-- ── Bottom deco A: wavy lines (repositioned by JS) ── -->
+    <g id="deco-a" transform="translate(-200,-200)" filter="url(#rgh)">
+      <path d="M0 0 Q14 -9 28 0 Q42 9 56 0 Q70 -9 84 0"  stroke="#1a1010" stroke-width="2.4" fill="none"/>
+      <path d="M0 14 Q14 5 28 14 Q42 23 56 14 Q70 5 84 14" stroke="#1a1010" stroke-width="2.4" fill="none"/>
+      <path d="M0 28 Q12 19 24 28 Q36 37 48 28 Q60 19 72 28" stroke="#1a1010" stroke-width="2.4" fill="none"/>
     </g>
 
-    <!-- ── Deco lines bottom-right ── -->
-    <g transform="translate(724,700)" filter="url(#rgh)">
-      <line x1="0" y1="0"  x2="-60" y2="0"  stroke="#1a1a1a" stroke-width="2.5"/>
-      <line x1="0" y1="11" x2="-46" y2="11" stroke="#1a1a1a" stroke-width="2.5"/>
-      <line x1="0" y1="22" x2="-32" y2="22" stroke="#1a1a1a" stroke-width="2.5"/>
+    <!-- ── Bottom deco B: zigzag growth chart (repositioned by JS) ── -->
+    <g id="deco-b" transform="translate(-200,-200)" filter="url(#rgh)">
+      <line x1="0" y1="60" x2="138" y2="60" stroke="#1a1010" stroke-width="2"/>
+      <line x1="0" y1="60" x2="0"   y2="0"  stroke="#1a1010" stroke-width="2"/>
+      <polyline points="4,56 18,42 34,48 52,30 70,36 90,18 112,22 132,4"
+                stroke="#1a1010" stroke-width="2.4" fill="none"/>
+      <polygon points="132,4 128,14 136,14" fill="#1a1010"/>
+    </g>
+
+    <!-- ── Bottom deco C: smooth growth curve (repositioned by JS) ── -->
+    <g id="deco-c" transform="translate(-200,-200)" filter="url(#rgh)">
+      <line x1="0" y1="60" x2="128" y2="60" stroke="#1a1010" stroke-width="2"/>
+      <line x1="0" y1="60" x2="0"   y2="0"  stroke="#1a1010" stroke-width="2"/>
+      <path d="M4 56 Q30 36 54 40 Q78 22 124 4"
+            stroke="#1a1010" stroke-width="2.4" fill="none" marker-end="url(#arr)"/>
     </g>
 
   </svg>
@@ -222,61 +167,186 @@
   <div class="content">
 
     <!-- Header -->
-    <div style="position:absolute;left:18px;top:18px;display:flex;align-items:center;gap:16px">
-      <div class="logo-box">in</div>
+    <div style="position:absolute;left:18px;top:18px;display:flex;align-items:center;gap:18px">
+      <div style="border:3.5px solid #1a1010;width:68px;height:68px;display:flex;
+                  align-items:center;justify-content:center;font-size:28px;font-weight:700;
+                  color:#1a1010;flex-shrink:0;letter-spacing:-1px">in</div>
       <div>
-        <div style="font-size:44px;font-weight:700;color:#1a1a1a;line-height:1.0;letter-spacing:0.3px">{{ title_line1 }}</div>
-        <div style="font-size:44px;font-weight:700;color:#1a1a1a;line-height:1.0;letter-spacing:0.3px">{{ title_line2 }}</div>
+        <div id="t1" style="font-size:52px;font-weight:700;color:#1a1010;line-height:1.0">{{ title_line1 }}</div>
+        <div id="t2" style="font-size:52px;font-weight:700;color:#1a1010;line-height:1.0">{{ title_line2 }}</div>
       </div>
     </div>
 
     <!-- TOP-LEFT: box1 -->
-    <div class="node" style="left:18px;top:148px">
+    <div class="node" id="node1" style="left:18px;top:150px">
       <div class="node-label">{{ box1.label }}</div>
       <ul class="node-pts">{% for p in box1.points %}<li>{{ p }}</li>{% endfor %}</ul>
     </div>
 
     <!-- TOP-RIGHT: box2 -->
-    <div class="node" style="left:500px;top:148px">
+    <div class="node" id="node2" style="left:500px;top:150px">
       <div class="node-label">{{ box2.label }}</div>
       <ul class="node-pts">{% for p in box2.points %}<li>{{ p }}</li>{% endfor %}</ul>
     </div>
 
-    <!-- CENTER: box4 (ENGAGEMENT-equivalent) -->
-    <div class="node" style="left:268px;top:338px">
+    <!-- CENTER: box4 (ENGAGEMENT equivalent) -->
+    <div class="node" id="node4" style="left:250px;top:368px">
       <div class="node-label">{{ box4.label }}</div>
       <ul class="node-pts">{% for p in box4.points %}<li>{{ p }}</li>{% endfor %}</ul>
     </div>
 
     <!-- BOTTOM-LEFT: box3 -->
-    <div class="node" style="left:18px;top:500px">
+    <div class="node" id="node3" style="left:18px;top:608px">
       <div class="node-label">{{ box3.label }}</div>
       <ul class="node-pts">{% for p in box3.points %}<li>{{ p }}</li>{% endfor %}</ul>
     </div>
 
     <!-- BOTTOM-RIGHT: box5 -->
-    <div class="node" style="left:500px;top:500px">
+    <div class="node" id="node5" style="left:500px;top:608px">
       <div class="node-label">{{ box5.label }}</div>
       <ul class="node-pts">{% for p in box5.points %}<li>{{ p }}</li>{% endfor %}</ul>
     </div>
 
     <!-- Footer -->
-    <div style="position:absolute;bottom:16px;right:18px;display:flex;align-items:center;gap:8px">
+    <div style="position:absolute;bottom:14px;right:16px;display:flex;align-items:center;gap:8px">
       <div class="fi"></div>
-      <span class="handle">{{ handle }}</span>
+      <span style="font-size:22px;color:#555;font-style:italic">{{ handle }}</span>
     </div>
 
   </div>
-
 </div>
 
 <script>
-document.querySelectorAll('.node-label').forEach(el => {
-  let sz = parseFloat(getComputedStyle(el).fontSize);
-  while (el.scrollWidth > el.parentElement.clientWidth - 4 && sz > 14) {
-    sz -= 1; el.style.fontSize = sz + 'px';
+// ─────────────────────────────────────────────────────────────────────────────
+// drawInfographic() — called by render.py after fonts are loaded.
+// Measures real element positions then draws all arrows + positions decos.
+// ─────────────────────────────────────────────────────────────────────────────
+window._infoDone = false;
+
+window.drawInfographic = function() {
+  if (window._infoDone) return;
+  window._infoDone = true;
+
+  var page = document.querySelector('.page');
+  var svg  = document.getElementById('isvg');
+  var pr   = page.getBoundingClientRect();
+  var SL   = 56;   // rings column width (SVG x-origin offset)
+  var GAP  = 5;    // arrowhead clearance from box edge
+  var NS   = 'http://www.w3.org/2000/svg';
+
+  // ── Shrink labels that overflow ──────────────────────────────────
+  document.querySelectorAll('.node-label').forEach(function(el) {
+    var sz = parseFloat(getComputedStyle(el).fontSize);
+    while (el.scrollWidth > el.parentElement.clientWidth - 4 && sz > 18) {
+      sz--; el.style.fontSize = sz + 'px';
+    }
+  });
+
+  // ── Shrink title lines ───────────────────────────────────────────
+  ['t1','t2'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var sz = parseFloat(getComputedStyle(el).fontSize);
+    while (el.scrollWidth > 560 && sz > 28) { sz--; el.style.fontSize = sz + 'px'; }
+  });
+
+  // ── Helper: label-box rect in SVG coordinates ─────────────────────
+  function labelRect(nodeId) {
+    var el = document.querySelector('#' + nodeId + ' .node-label');
+    var r  = el.getBoundingClientRect();
+    var L = r.left   - pr.left - SL;
+    var T = r.top    - pr.top;
+    var R = r.right  - pr.left - SL;
+    var B = r.bottom - pr.top;
+    return { L:L, T:T, R:R, B:B, cx:(L+R)/2, cy:(T+B)/2, w:r.width, h:r.height };
   }
-});
+
+  // ── Helper: full node (label + bullets) bottom in SVG coords ──────
+  function nodeBottom(nodeId) {
+    var el = document.getElementById(nodeId);
+    var r  = el.getBoundingClientRect();
+    return r.bottom - pr.top;
+  }
+
+  var n1 = labelRect('node1'), n2 = labelRect('node2'),
+      n3 = labelRect('node3'), n4 = labelRect('node4'), n5 = labelRect('node5');
+  var b1 = nodeBottom('node1'), b3 = nodeBottom('node3'),
+      b4 = nodeBottom('node4'), b5 = nodeBottom('node5');
+
+  // ── Lightbulb: centered between n1.R and n2.L ─────────────────────
+  var lbcx = (n1.R + n2.L) / 2;
+  var lbcy = n1.cy;
+  document.getElementById('lb').setAttribute('transform',
+    'translate(' + (lbcx - 26) + ',' + (lbcy - 34) + ')');
+
+  // ── Pencil: right side, vertically between top row and bottom row ──
+  var pcy = (n1.cy + n3.cy) / 2;
+  document.getElementById('pencil').setAttribute('transform',
+    'translate(774,' + (pcy - 50) + ') rotate(20)');
+
+  // ── Dashed lines: right of n2 column, between n2 and n5 ───────────
+  var dashX = n2.R + 14;
+  var dashY = (n2.B + n5.T) / 2 - 12;
+  if (dashX < 740) dashX = 740;
+  document.getElementById('dash-g').setAttribute('transform',
+    'translate(' + dashX + ',' + dashY + ')');
+  document.getElementById('dash-g').setAttribute('opacity', '1');
+
+  // ── Bottom decos: placed below the lowest node ─────────────────────
+  var decoY = Math.max(b3, b4, b5) + 20;
+  // (A) wavy lines under n3
+  document.getElementById('deco-a').setAttribute('transform',
+    'translate(' + n3.L + ',' + decoY + ')');
+  // (B) zigzag chart under n4 center
+  document.getElementById('deco-b').setAttribute('transform',
+    'translate(' + (n4.cx - 70) + ',' + decoY + ')');
+  // (C) smooth curve under n5
+  document.getElementById('deco-c').setAttribute('transform',
+    'translate(' + n5.L + ',' + decoY + ')');
+
+  // ── Arrow helper ───────────────────────────────────────────────────
+  function addArrow(x1, y1, x2, y2) {
+    var line = document.createElementNS(NS, 'line');
+    line.setAttribute('x1', x1.toFixed(1));
+    line.setAttribute('y1', y1.toFixed(1));
+    line.setAttribute('x2', x2.toFixed(1));
+    line.setAttribute('y2', y2.toFixed(1));
+    line.setAttribute('stroke', '#1a1010');
+    line.setAttribute('stroke-width', '2.8');
+    line.setAttribute('marker-end', 'url(#arr)');
+    line.setAttribute('filter', 'url(#rgh)');
+    svg.appendChild(line);
+  }
+
+  // ── ① Long horizontal arrow just above the top row ────────────────
+  addArrow(18, n1.T - 9, 810, n1.T - 9);
+
+  // ── ② n1 right edge → lightbulb left ─────────────────────────────
+  addArrow(n1.R + GAP, n1.cy, lbcx - 29, lbcy + 6);
+
+  // ── ③ lightbulb bottom → n4 top ──────────────────────────────────
+  addArrow(lbcx, lbcy + 44, n4.cx, n4.T - GAP);
+
+  // ── ④ n3 right edge → n4 left edge (horizontal) ──────────────────
+  addArrow(n3.R + GAP, n3.cy, n4.L - GAP, n4.cy);
+
+  // ── ⑤ Up arrow left column (n3 top → n1 full-node bottom) ─────────
+  var ux = n3.L + 22;
+  addArrow(ux, n3.T - GAP, ux, b1 + GAP);
+
+  // ── ⑥ n4 right edge → n5 left edge (horizontal) ──────────────────
+  addArrow(n4.R + GAP, n4.cy, n5.L - GAP, n5.cy);
+
+  // ── ⑦ n2 bottom → n5 top (vertical, same x-center) ───────────────
+  var dx = n2.cx;
+  addArrow(dx, n2.B + GAP, dx, n5.T - GAP);
+
+  // ── ⑧ n4 full bottom → center chart ──────────────────────────────
+  addArrow(n4.cx, b4 + GAP, n4.cx, decoY - GAP);
+};
+
+// Auto-trigger once fonts are ready (fallback for direct browser open)
+document.fonts.ready.then(function() { window.drawInfographic(); });
 </script>
 </body>
 </html>

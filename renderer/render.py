@@ -28,42 +28,9 @@ def _build_html(content: dict) -> str:
     return tmpl.render(**content)
 
 
-def _autofit(page) -> None:
-    """Shrink overflowing text in-browser before screenshotting."""
-    page.evaluate("""() => {
-        // Shrink box labels
-        document.querySelectorAll('.box-label').forEach(el => {
-            let size = parseFloat(getComputedStyle(el).fontSize);
-            const w = el.parentElement.clientWidth - 26;
-            while (el.scrollWidth > w && size > 11) {
-                size -= 1; el.style.fontSize = size + 'px';
-            }
-        });
-        // Shrink bullet points if box overflows
-        document.querySelectorAll('.box, .box-c').forEach(box => {
-            const pts = box.querySelectorAll('.box-pts li');
-            let size = pts.length ? parseFloat(getComputedStyle(pts[0]).fontSize) : 14;
-            while (box.scrollHeight > box.clientHeight + 10 && size > 10) {
-                size -= 0.5;
-                pts.forEach(li => li.style.fontSize = size + 'px');
-            }
-        });
-        // Shrink titles
-        document.querySelectorAll('.t1, .t2').forEach(el => {
-            let size = parseFloat(getComputedStyle(el).fontSize);
-            while (el.scrollWidth > el.parentElement.clientWidth && size > 22) {
-                size -= 1; el.style.fontSize = size + 'px';
-            }
-        });
-        // Shrink quote
-        const q = document.querySelector('.quote');
-        if (q) {
-            let qs = parseFloat(getComputedStyle(q).fontSize);
-            while (q.scrollHeight > 76 && qs > 12) {
-                qs -= 0.5; q.style.fontSize = qs + 'px';
-            }
-        }
-    }""")
+def _draw(page) -> None:
+    """Trigger JS arrow drawing + autofit after fonts are confirmed loaded."""
+    page.evaluate("window.drawInfographic && window.drawInfographic()")
 
 
 def render(content: dict, out_path: str) -> str:
@@ -89,10 +56,10 @@ def render(content: dict, out_path: str) -> str:
                 device_scale_factor=2,   # 2× = crisp 1800×1840 output
             )
             page.goto(f"file://{tmp_html}")
-            page.wait_for_load_state("networkidle")   # wait for Google Fonts
-            page.wait_for_timeout(600)                # extra buffer
-            _autofit(page)
-            page.wait_for_timeout(100)
+            page.wait_for_load_state("networkidle")   # waits for Google Fonts
+            page.wait_for_timeout(800)                # extra buffer for font apply
+            _draw(page)                               # draw arrows from real positions
+            page.wait_for_timeout(150)                # let SVG paint
             el = page.query_selector(".page")
             el.screenshot(path=str(out_path))
             browser.close()
