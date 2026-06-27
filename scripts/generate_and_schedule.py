@@ -489,6 +489,10 @@ def _build_infographic(topic: str, research: str) -> str | None:
         return None
 
     try:
+        import sys as _sys, pathlib as _pl
+        _root = str(_pl.Path(__file__).parent.parent)
+        if _root not in _sys.path:
+            _sys.path.insert(0, _root)
         import scripts.infographic as ig
     except ImportError:
         print("  [infographic] skipped — scripts.infographic not importable.")
