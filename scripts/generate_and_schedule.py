@@ -59,75 +59,64 @@ TONES   = _config["tones"]
 # ══════════════════════════════════════════════════════════════════════════════
 
 SYSTEM_PROMPT = """
-You are a ghost-writer for a technical AI founder on LinkedIn.
-You write like someone who has actually shipped AI products — raw, specific, opinionated.
-You know that specificity beats inspiration, one sharp sentence beats a paragraph, and
-the audience (AI founders, ML engineers, CTOs) can spot generic AI hype instantly.
+You are an elite viral LinkedIn AI content writer.
+Your task is to generate highly engaging LinkedIn posts ONLY about Artificial Intelligence.
+Goal: maximize reach, maximize engagement (likes, comments, reposts), make people stop
+scrolling in the first 2 lines, encourage comments and shares, build authority in the AI space.
+Target audience: AI engineers, developers, founders, tech professionals, AI beginners who want to learn.
 """.strip()
 
 VIRAL_POST_PROMPT = """
-You are writing for a LinkedIn profile in the AI/tech space.
-The audience is: AI founders, ML engineers, technical builders, AI enthusiasts, CTOs.
-The goal: maximum views, comments, likes — leading to audience monetization.
-
 ━━━ INPUT ━━━
-Niche   : {niche}
 Persona : {persona}
 Topic   : {topic}
 Tone    : {tone}
 
-Voice rule: Every post must sound like it came from someone who was personally in the room
-when this happened — not someone who read about it. Use "I", "we", "my team", "I shipped",
-"I broke", "I learned". First-person always. No exceptions.
-
-Research from the web (ground your post in this real data):
+Research from the web (ground your post in this real, current data):
 {research}
 
-━━━ VIRAL FRAMEWORKS — pick the best one for this topic ━━━
+━━━ WRITING RULES ━━━
+1. Start with a powerful hook in the first 1–2 lines.
+2. The hook must create curiosity, controversy, surprise, or urgency — make people stop scrolling.
+3. Use short lines (mobile-friendly). No long paragraphs.
+4. Write like a human creator, not corporate marketing.
+5. Mix education + storytelling + opinion.
+6. Include practical insights people can learn immediately.
+7. Add emotional triggers: fear of missing out, curiosity, surprise, relatability.
+8. Voice: first-person always — "I", "we", "my team", "I shipped", "I broke", "I learned".
+   Every post must sound like it came from someone personally in the room, not a journalist.
+9. End with a CTA that drives comments (a sharp question the audience genuinely wants to answer).
+10. Add 4–6 relevant hashtags at the end.
 
-Framework A — The Contrarian AI Take:
-  [Claim that goes against popular AI opinion]
-  [Specific technical reason why]
-  [What most people miss]
-  [Question that makes AI builders want to reply]
+━━━ POST STRUCTURE ━━━
+1. Hook (1–2 lines — stop the scroll)
+2. Problem / surprising fact
+3. Main insight (3–7 short punchy points or a tight story)
+4. Personal opinion or takeaway
+5. CTA (comment-driving question)
+6. Hashtags
 
-Framework B — The Builder War Story:
-  [What I tried / built / shipped]
-  [What actually happened — specific numbers or outcome]
-  [The uncomfortable lesson]
-  [Question inviting others to share their experience]
-
-Framework C — The Hype vs Reality:
-  [The thing everyone believes about AI]
-  [What actually happens in production]
-  [The specific gap nobody talks about]
-  [Sharp closing question or statement]
-
-Framework D — The Prediction / Hot Take:
-  [Bold claim about where AI is going]
-  [3 specific signals that support it]
-  [Who this affects and how]
-  [Question that sparks debate]
-
-━━━ RULES ━━━
-✓ Max 3000 characters TOTAL
-✓ Line 1 MUST hook — contrarian, surprising, or provocative
-✓ Every line break must earn its place — no filler lines
-✓ Use specific technical terms (LLM, RAG, fine-tuning, inference, etc.) — the audience is technical
-✓ End with a question that a senior ML engineer or AI founder would genuinely want to answer
-✓ Sound like a builder who has actually shipped — not a tech journalist
-✗ NO hashtags
-✗ NO generic emojis like 🚀🔥💡
+━━━ CONTENT RULES ━━━
+✓ Max 3000 characters TOTAL (including hashtags)
+✓ Short lines — single sentences or 2-line max per paragraph
+✓ Specific technical terms where relevant (LLM, RAG, fine-tuning, inference, vector DB, etc.)
+✓ Every claim must be specific — no vague generalities
 ✗ NO hype language ("game-changing", "revolutionary", "the future is here")
-✗ NO vague statements — every claim must be specific
-✗ NEVER cite external sources, tools, or companies as proof (no "See Devin", no "According to OpenAI") — all credibility must come from first-person experience or direct observation
-✗ NEVER write from a journalist or analyst perspective — always write as someone who personally built, shipped, broke, or fixed the thing
-✗ NEVER use corporate language ("this quarter", "leverage", "utilize", "use case", "ROI" as a standalone buzzword)
-✗ NEVER present 3 competing ideas in one post — pick ONE insight and go deep on it
-✗ NO bold/italic markdown — plain text only
+✗ NO generic emojis like 🚀🔥💡 — use sparingly and only if they add meaning
+✗ NO bold/italic markdown — plain text only (LinkedIn renders asterisks as literals)
+✗ NEVER present 3 competing ideas — pick ONE insight and go deep
+✗ NEVER write from an analyst perspective — always from someone who built/shipped/broke it
 
 ━━━ OUTPUT ━━━
-ONLY the post text. No quotes. No explanation. No preamble.
+Return ONLY valid JSON — no prose, no markdown fences, no explanation before or after:
+{{
+  "post_text": "the full LinkedIn post including hashtags",
+  "hook_score": <1-10 how likely this hook stops the scroll>,
+  "viral_score": <1-10 overall viral potential>,
+  "image_recommended": <true or false>,
+  "image_type": "<infographic|meme|carousel|chart|none>",
+  "image_prompt": "<detailed prompt for generating the image, or empty string if none>"
+}}
 """.strip()
 
 
@@ -307,61 +296,79 @@ def truncate_for_platform(content: str, platform: str = PLATFORM) -> str:
 # ══════════════════════════════════════════════════════════════════════════════
 
 def generate_post(topic: str, tone: str, niche: str, persona: str, research: str) -> str:
-    """Call Gemini with the viral post prompt + research brief."""
+    """Call Gemini with the viral post prompt + research brief, parse JSON response."""
+    import re as _re
+    import json as _json
+
     print("[ Step 2 ] Generating post with Gemini...")
 
     prompt = VIRAL_POST_PROMPT.format(
-        niche=niche,
         persona=persona,
         topic=topic,
         tone=tone,
         research=research[:2000],
     )
 
-    post = generate_text(prompt, SYSTEM_PROMPT)
+    raw = generate_text(prompt, SYSTEM_PROMPT)
 
-    # Strip surrounding quotes Gemini might add
-    if post.startswith('"') and post.endswith('"'):
-        post = post[1:-1].strip()
-    if post.startswith("'") and post.endswith("'"):
-        post = post[1:-1].strip()
+    # Strip markdown code fences the model might wrap around JSON
+    raw = raw.strip()
+    raw = _re.sub(r'^```(?:json)?\s*', '', raw)
+    raw = _re.sub(r'\s*```$', '', raw)
+    raw = raw.strip()
 
-    # Strip markdown formatting (LinkedIn renders plain text — asterisks show as literals)
-    import re as _re
+    # Parse JSON; fall back to treating the whole response as post text
+    hook_score = viral_score = "?"
+    image_type = "none"
+    image_prompt = ""
+    try:
+        parsed = _json.loads(raw)
+        post = parsed["post_text"].strip()
+        hook_score   = parsed.get("hook_score", "?")
+        viral_score  = parsed.get("viral_score", "?")
+        image_type   = parsed.get("image_type", "none")
+        image_prompt = parsed.get("image_prompt", "")
+    except (_json.JSONDecodeError, KeyError):
+        print("  [warn] JSON parse failed — using raw model output as post text.")
+        post = raw
+
+    # Strip any stray markdown formatting
     post = _re.sub(r'\*{1,3}(.+?)\*{1,3}', r'\1', post)
     post = _re.sub(r'_{1,2}(.+?)_{1,2}', r'\1', post)
     post = post.strip()
 
     limit = PLATFORM_CHAR_LIMITS[PLATFORM]
 
-    # If over limit, ask the model to shorten it (max 2 attempts)
+    # If over limit, ask the model to shorten (max 2 attempts, plain text only)
     for shorten_attempt in range(2):
         if len(post) <= limit:
             break
         print(f"  Post is {len(post)} chars — asking model to shorten (attempt {shorten_attempt + 1}/2)...")
         shorten_prompt = (
-            f"This LinkedIn post is {len(post)} characters, which is over the {limit}-character limit.\n\n"
-            f"Shorten it to strictly under {limit - 50} characters while keeping the same structure, voice, and impact.\n"
-            f"Keep the hook, the story, the lesson, and the question. Cut filler words, not ideas.\n"
-            f"Plain text only — no markdown, no hashtags.\n\n"
+            f"This LinkedIn post is {len(post)} characters, over the {limit}-character limit.\n\n"
+            f"Shorten it to strictly under {limit - 50} characters while keeping the hook, "
+            f"story, insights, CTA, and hashtags. Cut filler words, not ideas.\n"
+            f"Plain text only — no markdown, no JSON wrapper.\n\n"
             f"Original post:\n{post}\n\n"
-            f"Output ONLY the shortened post. Nothing else."
+            f"Output ONLY the shortened post text. Nothing else."
         )
         post = generate_text(shorten_prompt, SYSTEM_PROMPT)
         post = _re.sub(r'\*{1,3}(.+?)\*{1,3}', r'\1', post)
         post = _re.sub(r'_{1,2}(.+?)_{1,2}', r'\1', post)
         post = post.strip()
 
-    # Last-resort: hard truncate at sentence boundary rather than failing the run
+    # Last-resort hard truncation
     if len(post) > limit:
-        print(f"  AI shortening did not converge — applying hard truncation.")
+        print("  AI shortening did not converge — applying hard truncation.")
         post = truncate_for_platform(post, PLATFORM)
 
     print(f"\n  Generated post:\n  {'─'*50}")
     for line in post.split("\n"):
         print(f"  {line}")
     print(f"  {'─'*50}")
-    print(f"  Character count: {len(post)}/{limit}\n")
+    print(f"  Hook score : {hook_score}/10  |  Viral score : {viral_score}/10")
+    print(f"  Image      : {image_type}" + (f" — {image_prompt[:80]}..." if image_prompt else ""))
+    print(f"  Characters : {len(post)}/{limit}\n")
 
     validate_post_length(post, PLATFORM)
     return post

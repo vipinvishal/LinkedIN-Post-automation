@@ -1,29 +1,33 @@
 {
   "niche": "Artificial Intelligence / AI Tools / Future of Tech",
 
-  "persona": "A technical AI founder/builder who shares hard-won insights, contrarian takes, and real experiences in the AI space. Opinionated, specific, slightly provocative.",
+  "persona": "A technical AI founder/builder who shares hard-won insights, contrarian takes, and real experiences shipping AI products. Opinionated, specific, slightly provocative — writes like someone who was in the room when it happened.",
 
   "topics": [
+    "LLMs: why bigger models are not always smarter and what actually matters",
+    "RAG is being used wrong by 90% of teams — here is what they miss",
+    "AI Agents: why they fail in production but look perfect in demos",
+    "Prompt Engineering: the skill everyone is learning too late",
+    "Vector databases: what nobody tells you before you pick one",
+    "Fine-tuning vs RAG — the decision that killed 3 months of my team's work",
+    "AI coding tools: I tested them all for 30 days and the results surprised me",
+    "The AI news nobody is talking about that will change how you build",
+    "Model comparison: why switching LLMs mid-project is a nightmare",
+    "AI career advice: what skills will matter in 12 months and what will not",
+    "AI automation: what we automated that we should not have",
+    "AI startups: why most will fail and the ones that will not",
+    "AI trends: the shift happening quietly under all the hype",
+    "Generative AI in production: the gap between demo and reality",
+    "Multimodal AI: the use cases that actually work vs the ones that do not",
     "Why most AI wrappers will be dead in 12 months",
-    "Fine-tuning vs RAG — what nobody tells you before you waste 3 months",
-    "I replaced my entire data team with one AI pipeline — here is what broke",
-    "Why prompt engineering is a dead skill and what replaces it",
-    "The AI tool everyone recommends but almost nobody uses correctly",
-    "Why your AI chatbot has a 70% abandonment rate after day 1",
-    "LLMs are getting cheaper but AI startups are getting more expensive — why",
-    "What GPT-4 still cannot do that a junior dev can do in 10 minutes",
     "The ugly truth about AI accuracy that no vendor puts in their demo",
     "Why context window size is the most misunderstood metric in AI",
-    "I tested every AI coding assistant for 30 days — the results surprised me",
-    "Why most AI agents fail in production but work perfectly in demos",
-    "The difference between founders who win with AI and those who just talk about it",
-    "Why retrieval-augmented generation is overhyped for most use cases",
-    "Anthropic vs OpenAI vs Google — who is actually winning the enterprise deal",
-    "Why your AI product does not need a bigger model — it needs better data",
-    "The real cost of running an AI feature at scale nobody talks about",
     "Why AI is making average developers dangerous not obsolete",
+    "The real cost of running an AI feature at scale nobody talks about",
     "What I learned shipping 3 AI products that flopped before one took off",
-    "The one AI use case that actually has 10x ROI and is being ignored"
+    "Why your AI chatbot has a 70% abandonment rate after day 1",
+    "LLMs are getting cheaper but AI startups are getting more expensive — why",
+    "The one AI automation use case with real ROI that everyone is ignoring"
   ],
 
   "tones": [
@@ -31,6 +35,8 @@
     "Personal builder story with hard lesson",
     "Hot take that challenges AI hype",
     "Data-backed insight that surprises technical founders",
-    "Brutally honest observation from shipping real AI products"
+    "Brutally honest observation from shipping real AI products",
+    "FOMO-driven insight — what people are missing right now",
+    "Curiosity hook — a surprising fact most people in AI do not know"
   ]
 }
