@@ -32,12 +32,6 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Install Playwright Chromium
-        run: python -m playwright install chromium --with-deps
-
-      - name: Create infographic output dir
-        run: mkdir -p renderer/output
-
       - name: Detect content slot
         id: slot
         run: |
@@ -63,5 +57,3 @@ jobs:
           LINKEDIN_ACCESS_TOKEN:  ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           LINKEDIN_PERSON_ID:     ${{ secrets.LINKEDIN_PERSON_ID }}
           CONTENT_SLOT:           ${{ steps.slot.outputs.slot }}
-          INFOGRAPHIC_HANDLE:     ${{ secrets.INFOGRAPHIC_HANDLE }}
-          INCLUDE_INFOGRAPHIC:    "1"

@@ -392,8 +392,8 @@ def generate_post(topic: str, tone: str, niche: str, persona: str, research: str
 # STEP 3 — Post directly to LinkedIn
 # ══════════════════════════════════════════════════════════════════════════════
 
-def post_to_linkedin(post_text: str, image_urn: str = None) -> str:
-    """Publish the post directly to LinkedIn. Attaches image if image_urn provided."""
+def post_to_linkedin(post_text: str) -> str:
+    """Publish the post directly to LinkedIn."""
     print("[ Step 3 ] Posting to LinkedIn...")
 
     if not LINKEDIN_ACCESS_TOKEN:
@@ -411,14 +411,7 @@ def post_to_linkedin(post_text: str, image_urn: str = None) -> str:
 
     author_urn = f"urn:li:person:{LINKEDIN_PERSON_ID}"
 
-    if image_urn:
-        share_content = {
-            "shareCommentary":    {"text": post_text},
-            "shareMediaCategory": "IMAGE",
-            "media": [{"status": "READY", "media": image_urn}],
-        }
-    else:
-        share_content = {
+    share_content = {
             "shareCommentary":    {"text": post_text},
             "shareMediaCategory": "NONE",
         }
@@ -476,41 +469,6 @@ def post_to_linkedin(post_text: str, image_urn: str = None) -> str:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# STEP 2.5 — Generate & upload infographic (optional, graceful fallback)
-# ══════════════════════════════════════════════════════════════════════════════
-
-INCLUDE_INFOGRAPHIC = os.environ.get("INCLUDE_INFOGRAPHIC", "1") == "1"
-_PNG_PATH = os.path.join(_script_dir, "..", "renderer", "output", "infographic.png")
-
-
-def _build_infographic(topic: str, research: str) -> str | None:
-    """Generate infographic PNG and upload to LinkedIn. Returns asset URN or None."""
-    if not INCLUDE_INFOGRAPHIC:
-        return None
-
-    try:
-        import sys as _sys, pathlib as _pl
-        _root = str(_pl.Path(__file__).parent.parent)
-        if _root not in _sys.path:
-            _sys.path.insert(0, _root)
-        import scripts.infographic as ig
-    except ImportError:
-        print("  [infographic] skipped — scripts.infographic not importable.")
-        return None
-
-    print("[ Step 2.5 ] Generating infographic...")
-    try:
-        content = ig.generate_content(topic, research, generate_text)
-        png     = ig.render_infographic(content, _PNG_PATH)
-        urn     = ig.upload_to_linkedin(png, LINKEDIN_ACCESS_TOKEN, LINKEDIN_PERSON_ID)
-        print(f"  Infographic ready: {urn}\n")
-        return urn
-    except Exception as exc:
-        print(f"  [infographic] WARNING: failed ({exc}) — posting text-only.\n")
-        return None
-
-
-# ══════════════════════════════════════════════════════════════════════════════
 # MAIN
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -529,9 +487,8 @@ def main(preview: bool = False):
     print(f"{'='*60}\n")
 
     try:
-        research  = research_topic(topic, NICHE)
-        post      = generate_post(topic, tone, NICHE, PERSONA, research)
-        image_urn = _build_infographic(topic, research)
+        research = research_topic(topic, NICHE)
+        post     = generate_post(topic, tone, NICHE, PERSONA, research)
 
         if preview:
             print(f"{'='*60}")
@@ -541,11 +498,10 @@ def main(preview: bool = False):
             return
 
         validate_post_length(post, PLATFORM)
-        post_id = post_to_linkedin(post, image_urn=image_urn)
+        post_id = post_to_linkedin(post)
 
         print(f"{'='*60}")
         print(f"  Done! Post published directly to LinkedIn.")
-        print(f"  Image attached : {'yes' if image_urn else 'no (text-only)'}")
         print(f"  LinkedIn Post ID : {post_id}")
         print(f"{'='*60}\n")
 
