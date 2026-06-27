@@ -14,12 +14,11 @@ Requirements:
 
 import os
 import sys
-import json
 import secrets
 import webbrowser
 import urllib.parse
-import urllib.request
 from http.server import HTTPServer, BaseHTTPRequestHandler
+import requests
 from dotenv import load_dotenv
 
 load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env"))
@@ -52,8 +51,8 @@ auth_url = (
 
 # ── Step 2: local callback server ─────────────────────────────────────────────
 
-_auth_code  = None
-_got_state  = None
+_auth_code = None
+_got_state = None
 
 class CallbackHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -94,21 +93,19 @@ print("  Authorization code received.\n")
 
 # ── Step 4: exchange code for access token ────────────────────────────────────
 
-token_data = urllib.parse.urlencode({
-    "grant_type":    "authorization_code",
-    "code":          _auth_code,
-    "redirect_uri":  REDIRECT_URI,
-    "client_id":     CLIENT_ID,
-    "client_secret": CLIENT_SECRET,
-}).encode()
-
-req = urllib.request.Request(
+resp = requests.post(
     "https://www.linkedin.com/oauth/v2/accessToken",
-    data=token_data,
-    headers={"Content-Type": "application/x-www-form-urlencoded"},
+    data={
+        "grant_type":    "authorization_code",
+        "code":          _auth_code,
+        "redirect_uri":  REDIRECT_URI,
+        "client_id":     CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+    },
+    timeout=15,
 )
-with urllib.request.urlopen(req) as resp:
-    token_resp = json.loads(resp.read())
+resp.raise_for_status()
+token_resp = resp.json()
 
 access_token = token_resp.get("access_token")
 expires_in   = token_resp.get("expires_in", 0)
@@ -121,12 +118,13 @@ print(f"  Access token received (expires in ~{expires_days} days).\n")
 
 # ── Step 5: fetch person ID from userinfo ─────────────────────────────────────
 
-req = urllib.request.Request(
+resp = requests.get(
     "https://api.linkedin.com/v2/userinfo",
     headers={"Authorization": f"Bearer {access_token}"},
+    timeout=15,
 )
-with urllib.request.urlopen(req) as resp:
-    userinfo = json.loads(resp.read())
+resp.raise_for_status()
+userinfo = resp.json()
 
 person_id   = userinfo.get("sub")
 person_name = userinfo.get("name", "unknown")
