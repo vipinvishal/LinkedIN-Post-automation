@@ -2,8 +2,16 @@ name: Daily LinkedIn Post
 
 on:
   schedule:
-    - cron: '30 4 * * *'   # 10:00 AM IST (UTC+5:30) every day
-  workflow_dispatch:         # allow manual trigger from GitHub Actions tab
+    - cron: '30 3 * * *'   # 9:00 AM IST  — Breaking AI news / hot take
+    - cron: '30 7 * * *'   # 1:00 PM IST  — AI educational post
+    - cron: '30 12 * * *'  # 6:00 PM IST  — Personal learning / build-in-public
+    - cron: '30 16 * * *'  # 10:00 PM IST — Advanced AI concept
+  workflow_dispatch:
+    inputs:
+      content_slot:
+        description: 'Content slot: news | educational | personal | advanced'
+        required: false
+        default: 'news'
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -24,6 +32,21 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Detect content slot
+        id: slot
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "slot=${{ github.event.inputs.content_slot }}" >> $GITHUB_OUTPUT
+          else
+            case "${{ github.event.schedule }}" in
+              "30 3 * * *")  echo "slot=news"        >> $GITHUB_OUTPUT ;;
+              "30 7 * * *")  echo "slot=educational" >> $GITHUB_OUTPUT ;;
+              "30 12 * * *") echo "slot=personal"    >> $GITHUB_OUTPUT ;;
+              "30 16 * * *") echo "slot=advanced"    >> $GITHUB_OUTPUT ;;
+              *)             echo "slot=news"        >> $GITHUB_OUTPUT ;;
+            esac
+          fi
+
       - name: Generate and post to LinkedIn
         run: python scripts/generate_and_schedule.py
         env:
@@ -33,3 +56,4 @@ jobs:
           EXA_API_KEY:            ${{ secrets.EXA_API_KEY }}
           LINKEDIN_ACCESS_TOKEN:  ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
           LINKEDIN_PERSON_ID:     ${{ secrets.LINKEDIN_PERSON_ID }}
+          CONTENT_SLOT:           ${{ steps.slot.outputs.slot }}

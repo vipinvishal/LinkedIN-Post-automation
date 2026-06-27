@@ -3,8 +3,12 @@
 LinkedIn Post Agent
 Pipeline: Exa (research) → Gemini (generate viral post) → LinkedIn API (post directly)
 
-Run locally : python scripts/generate_and_schedule.py
-GitHub Actions triggers this automatically every day at 10 AM IST.
+Run locally:
+  python scripts/generate_and_schedule.py              # defaults to 'news' slot
+  python scripts/generate_and_schedule.py --preview    # preview only, no post
+  CONTENT_SLOT=educational python scripts/generate_and_schedule.py --preview
+
+GitHub Actions triggers 4× daily at 9 AM / 1 PM / 6 PM / 10 PM IST.
 """
 
 import os
@@ -43,15 +47,23 @@ PLATFORM_CHAR_LIMITS = {
 }
 PLATFORM = "linkedin"  # this pipeline posts to LinkedIn only
 
+# ── Content slot (set by workflow; defaults to 'news') ────────────────────────
+CONTENT_SLOT = os.environ.get("CONTENT_SLOT", "news")
+_VALID_SLOTS = ("news", "educational", "personal", "advanced")
+if CONTENT_SLOT not in _VALID_SLOTS:
+    CONTENT_SLOT = "news"
+
 # ── Load topics config ────────────────────────────────────────────────────────
 _script_dir = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(_script_dir, "topics.json"), "r") as f:
     _config = json.load(f)
 
-NICHE   = _config["niche"]
+NICHE  = _config["niche"]
 PERSONA = _config["persona"]
-TOPICS  = _config["topics"]
-TONES   = _config["tones"]
+_slot   = _config["content_slots"][CONTENT_SLOT]
+SLOT_LABEL = _slot["label"]
+TOPICS     = _slot["topics"]
+TONES      = _slot["tones"]
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -68,9 +80,10 @@ Target audience: AI engineers, developers, founders, tech professionals, AI begi
 
 VIRAL_POST_PROMPT = """
 ━━━ INPUT ━━━
-Persona : {persona}
-Topic   : {topic}
-Tone    : {tone}
+Persona      : {persona}
+Content slot : {slot_label}
+Topic        : {topic}
+Tone         : {tone}
 
 Research from the web (ground your post in this real, current data):
 {research}
@@ -304,6 +317,7 @@ def generate_post(topic: str, tone: str, niche: str, persona: str, research: str
 
     prompt = VIRAL_POST_PROMPT.format(
         persona=persona,
+        slot_label=SLOT_LABEL,
         topic=topic,
         tone=tone,
         research=research[:2000],
@@ -463,9 +477,9 @@ def main(preview: bool = False):
     print(f"\n{'='*60}")
     print(f"  LinkedIn Post Agent — {datetime.now().strftime('%Y-%m-%d %H:%M UTC')}")
     if preview:
-        print(f"  MODE: PREVIEW (no Buffer scheduling)")
+        print(f"  MODE: PREVIEW (no LinkedIn posting)")
     print(f"{'='*60}")
-    print(f"  Niche : {NICHE}")
+    print(f"  Slot  : [{CONTENT_SLOT.upper()}] {SLOT_LABEL}")
     print(f"  Topic : {topic}")
     print(f"  Tone  : {tone}")
     print(f"{'='*60}\n")

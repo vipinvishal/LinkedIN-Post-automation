@@ -3,40 +3,93 @@
 
   "persona": "A technical AI founder/builder who shares hard-won insights, contrarian takes, and real experiences shipping AI products. Opinionated, specific, slightly provocative — writes like someone who was in the room when it happened.",
 
-  "topics": [
-    "LLMs: why bigger models are not always smarter and what actually matters",
-    "RAG is being used wrong by 90% of teams — here is what they miss",
-    "AI Agents: why they fail in production but look perfect in demos",
-    "Prompt Engineering: the skill everyone is learning too late",
-    "Vector databases: what nobody tells you before you pick one",
-    "Fine-tuning vs RAG — the decision that killed 3 months of my team's work",
-    "AI coding tools: I tested them all for 30 days and the results surprised me",
-    "The AI news nobody is talking about that will change how you build",
-    "Model comparison: why switching LLMs mid-project is a nightmare",
-    "AI career advice: what skills will matter in 12 months and what will not",
-    "AI automation: what we automated that we should not have",
-    "AI startups: why most will fail and the ones that will not",
-    "AI trends: the shift happening quietly under all the hype",
-    "Generative AI in production: the gap between demo and reality",
-    "Multimodal AI: the use cases that actually work vs the ones that do not",
-    "Why most AI wrappers will be dead in 12 months",
-    "The ugly truth about AI accuracy that no vendor puts in their demo",
-    "Why context window size is the most misunderstood metric in AI",
-    "Why AI is making average developers dangerous not obsolete",
-    "The real cost of running an AI feature at scale nobody talks about",
-    "What I learned shipping 3 AI products that flopped before one took off",
-    "Why your AI chatbot has a 70% abandonment rate after day 1",
-    "LLMs are getting cheaper but AI startups are getting more expensive — why",
-    "The one AI automation use case with real ROI that everyone is ignoring"
-  ],
+  "content_slots": {
 
-  "tones": [
-    "Contrarian take with specific technical evidence",
-    "Personal builder story with hard lesson",
-    "Hot take that challenges AI hype",
-    "Data-backed insight that surprises technical founders",
-    "Brutally honest observation from shipping real AI products",
-    "FOMO-driven insight — what people are missing right now",
-    "Curiosity hook — a surprising fact most people in AI do not know"
-  ]
+    "news": {
+      "label": "Breaking AI news / hot take",
+      "topics": [
+        "The AI release everyone is talking about and what it actually means for builders",
+        "Why the latest LLM benchmark is misleading and what to look at instead",
+        "Hot take: what this week's biggest AI news gets wrong",
+        "The AI trend nobody is reacting to fast enough",
+        "OpenAI vs Anthropic vs Google — who just made the smartest move",
+        "The AI model that just dropped and why it changes your stack decisions",
+        "What the latest AI funding round tells us about where the industry is going",
+        "The AI news story buried under the hype that actually matters"
+      ],
+      "tones": [
+        "Hot take that challenges the popular AI narrative",
+        "FOMO-driven insight — what people are missing right now",
+        "Contrarian take with specific technical evidence",
+        "Brutally honest reaction from someone who ships AI products"
+      ]
+    },
+
+    "educational": {
+      "label": "AI educational post",
+      "topics": [
+        "RAG explained for engineers who are tired of vague explanations",
+        "How vector databases actually work — and when NOT to use one",
+        "Prompt engineering: the one technique that 10x'd our output quality",
+        "Fine-tuning vs RAG — a decision framework that actually works in practice",
+        "LLM context windows: what the number means and why you are using it wrong",
+        "AI Agents: the architecture that works in production vs the demos",
+        "How to evaluate an LLM output without just eyeballing it",
+        "Multimodal AI: what it is, what it can do today, and what it still cannot",
+        "The AI tech stack I would choose if I were starting a new product today",
+        "Embeddings explained: what they are and why every AI app needs them"
+      ],
+      "tones": [
+        "Data-backed insight that surprises technical founders",
+        "Curiosity hook — a surprising fact most people in AI do not know",
+        "Step-by-step builder insight from real production experience",
+        "Practical breakdown that gives immediate value to engineers"
+      ]
+    },
+
+    "personal": {
+      "label": "Personal learning / build-in-public",
+      "topics": [
+        "What I learned shipping an AI feature that nobody used",
+        "The AI mistake I made that cost us three weeks of engineering time",
+        "I built in public this week — here is what surprised me",
+        "What building AI products actually taught me about software engineering",
+        "The moment I realized I was building AI wrong",
+        "Why I stopped chasing the latest AI model and what I do instead",
+        "What I wish someone had told me before I built my first AI agent",
+        "The unglamorous side of shipping AI that nobody posts about",
+        "How I went from AI skeptic to building AI products full-time",
+        "A week of building with AI — what worked, what broke, what I learned"
+      ],
+      "tones": [
+        "Personal builder story with hard lesson",
+        "Brutally honest observation from shipping real AI products",
+        "Vulnerable and relatable — sharing the failure, not just the win",
+        "Build-in-public energy — raw and unfiltered progress update"
+      ]
+    },
+
+    "advanced": {
+      "label": "Advanced AI concept",
+      "topics": [
+        "Why attention mechanisms are misunderstood by most people who use LLMs",
+        "The latency vs accuracy tradeoff in production AI nobody talks about honestly",
+        "How to think about AI system design when you cannot predict the inputs",
+        "Why inference optimization matters more than model selection at scale",
+        "The real difference between zero-shot, few-shot, and fine-tuned models in production",
+        "Agentic loops: where they break and how to build them to not",
+        "Why your RAG pipeline's retrieval step is the weakest link",
+        "Advanced prompt chaining patterns that actually hold up under production load",
+        "The observability stack every serious AI product needs but most skip",
+        "Why AI system evals are harder than unit tests and how to approach them"
+      ],
+      "tones": [
+        "Contrarian take with specific technical evidence",
+        "Deep technical insight from someone who has hit the same wall",
+        "Data-backed insight that surprises technical founders",
+        "Expert-level breakdown that makes senior engineers stop and think"
+      ]
+    }
+
+  }
 }
