@@ -391,26 +391,26 @@ def post_to_linkedin(post_text: str) -> str:
     author_urn = f"urn:li:person:{LINKEDIN_PERSON_ID}"
 
     payload = {
-        "author":        author_urn,
-        "commentary":    post_text,
-        "visibility":    "PUBLIC",
-        "distribution":  {
-            "feedDistribution":           "MAIN_FEED",
-            "targetEntities":             [],
-            "thirdPartyDistributionChannels": [],
+        "author": author_urn,
+        "lifecycleState": "PUBLISHED",
+        "specificContent": {
+            "com.linkedin.ugc.ShareContent": {
+                "shareCommentary": {"text": post_text},
+                "shareMediaCategory": "NONE",
+            }
         },
-        "lifecycleState":             "PUBLISHED",
-        "isReshareDisabledByAuthor":  False,
+        "visibility": {
+            "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+        },
     }
 
     for attempt in range(1, MAX_RETRIES + 1):
         response = requests.post(
-            "https://api.linkedin.com/rest/posts",
+            "https://api.linkedin.com/v2/ugcPosts",
             headers={
-                "Authorization":              f"Bearer {LINKEDIN_ACCESS_TOKEN}",
-                "Content-Type":               "application/json",
-                "LinkedIn-Version":           "202501",
-                "X-Restli-Protocol-Version":  "2.0.0",
+                "Authorization":             f"Bearer {LINKEDIN_ACCESS_TOKEN}",
+                "Content-Type":              "application/json",
+                "X-Restli-Protocol-Version": "2.0.0",
             },
             json=payload,
             timeout=15,
