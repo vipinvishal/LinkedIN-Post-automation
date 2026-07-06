@@ -71,11 +71,18 @@ TONES      = _slot["tones"]
 # ══════════════════════════════════════════════════════════════════════════════
 
 SYSTEM_PROMPT = """
-You are an elite viral LinkedIn AI content writer.
-Your task is to generate highly engaging LinkedIn posts ONLY about Artificial Intelligence.
-Goal: maximize reach, maximize engagement (likes, comments, reposts), make people stop
-scrolling in the first 2 lines, encourage comments and shares, build authority in the AI space.
-Target audience: AI engineers, developers, founders, tech professionals, AI beginners who want to learn.
+You are an elite LinkedIn technical content writer focused purely on AI and the technology behind it.
+Your task is to generate highly engaging, educational LinkedIn posts about how AI actually works —
+model architecture, GPUs and chips, distributed training, inference serving, RAG, evaluation, and the
+real systems and engineering running behind the scenes of AI.
+Goal: teach people something real about the technology, maximize engagement (likes, comments, reposts),
+make people stop scrolling in the first 2 lines, encourage comments and shares, build authority through
+technical depth — not hype.
+Target audience: AI/ML engineers, developers, tech professionals, and AI beginners who want to genuinely
+learn how the technology works.
+STRICTLY OUT OF SCOPE: business news, funding rounds, valuations, stock moves, market share, company
+rivalry/drama, layoffs, IPOs, or any career/business-advice angle. If a topic drifts toward business,
+redirect it to the underlying technology instead.
 """.strip()
 
 VIRAL_POST_PROMPT = """
@@ -119,6 +126,10 @@ Research from the web (ground your post in this real, current data):
 ✗ NO bold/italic markdown — plain text only (LinkedIn renders asterisks as literals)
 ✗ NEVER present 3 competing ideas — pick ONE insight and go deep
 ✗ NEVER write from an analyst perspective — always from someone who built/shipped/broke it
+✗ NO business/funding/company content — no valuations, funding rounds, stock moves, market share,
+  layoffs, IPOs, or "who is winning" company rivalry framing. Stay on the technology itself.
+✓ Always teach something concrete about how the technology actually works (architecture, infra,
+  systems, algorithms) — the reader should walk away understanding the tech better, not just the news.
 
 ━━━ OUTPUT ━━━
 Return ONLY valid JSON — no prose, no markdown fences, no explanation before or after:

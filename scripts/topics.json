@@ -1,27 +1,27 @@
 {
-  "niche": "Artificial Intelligence / AI Tools / Future of Tech",
+  "niche": "AI systems, infrastructure, and model architecture",
 
-  "persona": "A technical AI founder/builder who shares hard-won insights, contrarian takes, and real experiences shipping AI products. Opinionated, specific, slightly provocative — writes like someone who was in the room when it happened.",
+  "persona": "A hands-on AI/ML systems engineer who explains how AI actually works under the hood — architecture, infrastructure, and hard-won technical lessons from building and running these systems. Precise, specific, technical. Writes to teach, not to pitch a company or chase a narrative.",
 
   "content_slots": {
 
     "news": {
-      "label": "Breaking AI news / hot take",
+      "label": "New AI model / release, explained technically",
       "topics": [
-        "The AI release everyone is talking about and what it actually means for builders",
-        "Why the latest LLM benchmark is misleading and what to look at instead",
-        "Hot take: what this week's biggest AI news gets wrong",
-        "The AI trend nobody is reacting to fast enough",
-        "OpenAI vs Anthropic vs Google — who just made the smartest move",
-        "The AI model that just dropped and why it changes your stack decisions",
-        "What the latest AI funding round tells us about where the industry is going",
-        "The AI news story buried under the hype that actually matters"
+        "The new LLM that just launched — what's actually different in its architecture",
+        "Comparing the latest model release against its predecessor: what really changed under the hood",
+        "The benchmark everyone is quoting for the new model release — and what it actually measures",
+        "What context window, parameter count, and training data changes in the new release mean in practice",
+        "The inference tricks the newest model release uses to run faster or cheaper",
+        "Open-weight vs closed model release: what's actually different in how you can run and fine-tune each",
+        "The quantization or distillation technique behind the newest small/efficient model release",
+        "Reading a new model's technical report: the details that matter more than the headline number"
       ],
       "tones": [
-        "Hot take that challenges the popular AI narrative",
-        "FOMO-driven insight — what people are missing right now",
-        "Contrarian take with specific technical evidence",
-        "Brutally honest reaction from someone who ships AI products"
+        "Curiosity hook — a technical detail in the release most people are missing",
+        "Data-backed breakdown grounded in the technical report, not the hype",
+        "Contrarian take on what a benchmark number really tells you",
+        "Practical read from someone who will actually run/build with this model"
       ]
     },
 
@@ -30,20 +30,25 @@
       "topics": [
         "RAG explained for engineers who are tired of vague explanations",
         "How vector databases actually work — and when NOT to use one",
-        "Prompt engineering: the one technique that 10x'd our output quality",
-        "Fine-tuning vs RAG — a decision framework that actually works in practice",
         "LLM context windows: what the number means and why you are using it wrong",
         "AI Agents: the architecture that works in production vs the demos",
         "How to evaluate an LLM output without just eyeballing it",
-        "Multimodal AI: what it is, what it can do today, and what it still cannot",
-        "The AI tech stack I would choose if I were starting a new product today",
-        "Embeddings explained: what they are and why every AI app needs them"
+        "Embeddings explained: what they are and why every AI app needs them",
+        "What a GPU actually does during LLM training that a CPU can't",
+        "CUDA cores, tensor cores, and memory bandwidth: what actually limits training speed",
+        "How distributed training splits a model across hundreds of GPUs",
+        "Model quantization explained: how a model gets smaller without getting much dumber",
+        "Inference serving 101: what frameworks like vLLM actually optimize for",
+        "KV cache explained: the trick that makes chat with LLMs fast",
+        "How tokenization works and why it breaks in surprising ways",
+        "What actually happens inside a transformer during a single forward pass",
+        "Why training an LLM needs so much more memory than running one"
       ],
       "tones": [
-        "Data-backed insight that surprises technical founders",
-        "Curiosity hook — a surprising fact most people in AI do not know",
+        "Curiosity hook — a surprising technical fact most people in AI do not know",
         "Step-by-step builder insight from real production experience",
-        "Practical breakdown that gives immediate value to engineers"
+        "Practical breakdown that gives immediate value to engineers",
+        "Data-backed insight that surprises technical readers"
       ]
     },
 
@@ -55,15 +60,15 @@
         "I built in public this week — here is what surprised me",
         "What building AI products actually taught me about software engineering",
         "The moment I realized I was building AI wrong",
-        "Why I stopped chasing the latest AI model and what I do instead",
         "What I wish someone had told me before I built my first AI agent",
         "The unglamorous side of shipping AI that nobody posts about",
-        "How I went from AI skeptic to building AI products full-time",
-        "A week of building with AI — what worked, what broke, what I learned"
+        "A week of building with AI — what worked, what broke, what I learned",
+        "What debugging a slow RAG pipeline taught me about my own assumptions",
+        "The infra bug that taught me more about AI systems than any course did"
       ],
       "tones": [
         "Personal builder story with hard lesson",
-        "Brutally honest observation from shipping real AI products",
+        "Brutally honest observation from shipping real AI systems",
         "Vulnerable and relatable — sharing the failure, not just the win",
         "Build-in-public energy — raw and unfiltered progress update"
       ]
@@ -74,19 +79,23 @@
       "topics": [
         "Why attention mechanisms are misunderstood by most people who use LLMs",
         "The latency vs accuracy tradeoff in production AI nobody talks about honestly",
-        "How to think about AI system design when you cannot predict the inputs",
         "Why inference optimization matters more than model selection at scale",
         "The real difference between zero-shot, few-shot, and fine-tuned models in production",
         "Agentic loops: where they break and how to build them to not",
         "Why your RAG pipeline's retrieval step is the weakest link",
-        "Advanced prompt chaining patterns that actually hold up under production load",
-        "The observability stack every serious AI product needs but most skip",
-        "Why AI system evals are harder than unit tests and how to approach them"
+        "The observability stack every serious AI system needs but most skip",
+        "Why AI system evals are harder than unit tests and how to approach them",
+        "How model parallelism, data parallelism, and pipeline parallelism actually differ",
+        "Why memory bandwidth, not compute, is the real bottleneck in LLM inference",
+        "How mixed precision training works and why it doesn't break model accuracy",
+        "What happens on the network (NVLink/InfiniBand) when you train across a GPU cluster",
+        "Why serving an LLM at scale is a systems problem, not a model problem",
+        "Speculative decoding explained: how models get inference speedups without changing weights"
       ],
       "tones": [
         "Contrarian take with specific technical evidence",
         "Deep technical insight from someone who has hit the same wall",
-        "Data-backed insight that surprises technical founders",
+        "Data-backed insight that surprises technical readers",
         "Expert-level breakdown that makes senior engineers stop and think"
       ]
     }
