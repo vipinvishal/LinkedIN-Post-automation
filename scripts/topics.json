@@ -1,7 +1,7 @@
 {
   "niche": "AI systems, infrastructure, and model architecture",
 
-  "persona": "A hands-on AI/ML systems engineer who explains how AI actually works under the hood — architecture, infrastructure, and hard-won technical lessons from building and running these systems. Precise, specific, technical. Writes to teach, not to pitch a company or chase a narrative.",
+  "persona": "An individual engineer who studies AI/ML deeply, every single day, and writes about what I learn in public. I am not a founder, not a CEO, not a manager, not a tech lead — I don't run a team or speak for a company. I read papers, dig through source code, break things in my own small projects, and explain what I actually understood. Curious, precise, occasionally wrong and honest about it. This is one person's daily learning journal, not a company update.",
 
   "content_slots": {
 
@@ -15,13 +15,19 @@
         "The inference tricks the newest model release uses to run faster or cheaper",
         "Open-weight vs closed model release: what's actually different in how you can run and fine-tune each",
         "The quantization or distillation technique behind the newest small/efficient model release",
-        "Reading a new model's technical report: the details that matter more than the headline number"
+        "Reading a new model's technical report: the details that matter more than the headline number",
+        "The new reasoning model everyone is talking about — what's actually different in how it 'thinks'",
+        "A new Mixture-of-Experts release — how MoE routing actually works under the hood",
+        "The new multimodal model release — how it actually fuses vision and text internally",
+        "A new open-weight model's tokenizer and vocab choices — why they matter more than people think",
+        "What a new model's system card reveals about its training data and safety testing",
+        "The new small/on-device model release — what tradeoffs make it possible"
       ],
       "tones": [
         "Curiosity hook — a technical detail in the release most people are missing",
         "Data-backed breakdown grounded in the technical report, not the hype",
         "Contrarian take on what a benchmark number really tells you",
-        "Practical read from someone who will actually run/build with this model"
+        "Explained simply, like I'm teaching myself as I write it"
       ]
     },
 
@@ -42,35 +48,57 @@
         "KV cache explained: the trick that makes chat with LLMs fast",
         "How tokenization works and why it breaks in surprising ways",
         "What actually happens inside a transformer during a single forward pass",
-        "Why training an LLM needs so much more memory than running one"
+        "Why training an LLM needs so much more memory than running one",
+        "Self-attention vs cross-attention: what's actually different in the math",
+        "RoPE (rotary positional embeddings) explained without the scary notation",
+        "Flash Attention explained: how it speeds up attention without changing the math",
+        "LoRA and QLoRA explained: how fine-tuning a huge model with tiny extra weights works",
+        "RLHF explained: how human feedback actually becomes model weights",
+        "DPO vs RLHF: two different ways to align a model, explained simply",
+        "Mixture of Experts (MoE) explained: why only part of the model runs per token",
+        "How diffusion models actually generate an image step by step",
+        "Softmax and temperature explained: why 'creativity' in an LLM is just a number",
+        "Beam search vs greedy decoding vs sampling: how an LLM actually picks the next word",
+        "What a loss function is actually measuring during LLM training",
+        "Batch size, learning rate, and epochs explained for people who just use the defaults",
+        "Why hallucination happens: what's actually going on inside the model",
+        "GGUF, GPTQ, AWQ: what these quantization formats actually mean",
+        "What 'grounding' means in RAG and why retrieval alone doesn't fix hallucination",
+        "Chunking strategies in RAG: why chunk size quietly wrecks retrieval quality",
+        "Reranking in RAG explained: the step most tutorials skip"
       ],
       "tones": [
         "Curiosity hook — a surprising technical fact most people in AI do not know",
-        "Step-by-step builder insight from real production experience",
+        "Explained the way I wish someone had explained it to me",
         "Practical breakdown that gives immediate value to engineers",
         "Data-backed insight that surprises technical readers"
       ]
     },
 
     "personal": {
-      "label": "Personal learning / build-in-public",
+      "label": "Daily learning notes / personal study journal",
       "topics": [
-        "What I learned shipping an AI feature that nobody used",
-        "The AI mistake I made that cost us three weeks of engineering time",
-        "I built in public this week — here is what surprised me",
-        "What building AI products actually taught me about software engineering",
-        "The moment I realized I was building AI wrong",
-        "What I wish someone had told me before I built my first AI agent",
-        "The unglamorous side of shipping AI that nobody posts about",
-        "A week of building with AI — what worked, what broke, what I learned",
-        "What debugging a slow RAG pipeline taught me about my own assumptions",
-        "The infra bug that taught me more about AI systems than any course did"
+        "A concept I finally understood today after struggling with it for days",
+        "What re-reading the attention paper taught me the second time around",
+        "A small AI project I broke on purpose today just to understand it better",
+        "The mistake I made in my own RAG side-project and what it taught me",
+        "What I got wrong about transformers until I actually implemented one from scratch",
+        "Today's rabbit hole: how I ended up learning about KV caches by accident",
+        "A paper I read today that changed how I think about model evaluation",
+        "What debugging my own slow inference code taught me about GPUs",
+        "The AI concept I thought I understood until I tried explaining it simply",
+        "What building a tiny transformer from scratch taught me that no course did",
+        "A week of daily AI study — what stuck, what didn't, what I'm doing differently",
+        "The moment a diagram finally made an AI concept click for me",
+        "What I learned comparing two research papers that disagree with each other",
+        "A dumb question I asked myself about LLMs that turned into a real insight",
+        "What happens when you actually read a model's technical report cover to cover"
       ],
       "tones": [
-        "Personal builder story with hard lesson",
-        "Brutally honest observation from shipping real AI systems",
-        "Vulnerable and relatable — sharing the failure, not just the win",
-        "Build-in-public energy — raw and unfiltered progress update"
+        "Honest personal learning story — a struggle that led to a real insight",
+        "Curious and slightly self-deprecating — 'I thought I knew this, then...'",
+        "Vulnerable and relatable — sharing the confusion, not just the 'aha' moment",
+        "Daily-study-log energy — raw, specific, in-progress learning"
       ]
     },
 
@@ -90,7 +118,17 @@
         "How mixed precision training works and why it doesn't break model accuracy",
         "What happens on the network (NVLink/InfiniBand) when you train across a GPU cluster",
         "Why serving an LLM at scale is a systems problem, not a model problem",
-        "Speculative decoding explained: how models get inference speedups without changing weights"
+        "Speculative decoding explained: how models get inference speedups without changing weights",
+        "Why scaling laws are really about compute-optimal tradeoffs, not just 'bigger is better'",
+        "Catastrophic forgetting explained: why fine-tuning can quietly break a model's other skills",
+        "Why long-context models still struggle with the 'lost in the middle' problem",
+        "How gradient checkpointing trades compute for memory during training",
+        "Why sparse attention variants exist and what they actually trade away",
+        "Constitutional AI and RLAIF: how models can help align other models",
+        "Why token-level probability doesn't tell you what a model 'believes'",
+        "The real bottlenecks in multi-agent systems that demos never show",
+        "Why context caching and prompt caching change the economics of LLM apps",
+        "How activation functions like SwiGLU differ from plain ReLU and why it matters"
       ],
       "tones": [
         "Contrarian take with specific technical evidence",

@@ -71,7 +71,9 @@ TONES      = _slot["tones"]
 # ══════════════════════════════════════════════════════════════════════════════
 
 SYSTEM_PROMPT = """
-You are an elite LinkedIn technical content writer focused purely on AI and the technology behind it.
+You are ghostwriting LinkedIn posts for ONE individual engineer who studies AI/ML deeply every day and
+shares what they learn in public. This person is an individual contributor learning in public — NOT a
+founder, NOT a CEO, NOT a tech lead, NOT a manager, and does not speak for any company or team.
 Your task is to generate highly engaging, educational LinkedIn posts about how AI actually works —
 model architecture, GPUs and chips, distributed training, inference serving, RAG, evaluation, and the
 real systems and engineering running behind the scenes of AI.
@@ -81,8 +83,10 @@ technical depth — not hype.
 Target audience: AI/ML engineers, developers, tech professionals, and AI beginners who want to genuinely
 learn how the technology works.
 STRICTLY OUT OF SCOPE: business news, funding rounds, valuations, stock moves, market share, company
-rivalry/drama, layoffs, IPOs, or any career/business-advice angle. If a topic drifts toward business,
-redirect it to the underlying technology instead.
+rivalry/drama, layoffs, IPOs, career/business-advice angles, or anything implying the writer leads a team,
+runs a company, or manages an org's AI strategy. This is one engineer's personal learning journey — never
+a company update, product announcement, or leadership narrative. If a topic drifts toward business or
+leadership framing, redirect it to the underlying technology instead.
 """.strip()
 
 VIRAL_POST_PROMPT = """
@@ -102,11 +106,16 @@ Research from the web (ground your post in this real, current data):
 4. Write like a human creator, not corporate marketing.
 5. Mix education + storytelling + opinion.
 6. Include practical insights people can learn immediately.
-7. Add emotional triggers: fear of missing out, curiosity, surprise, relatability.
-8. Voice: first-person always — "I", "we", "my team", "I shipped", "I broke", "I learned".
-   Every post must sound like it came from someone personally in the room, not a journalist.
-9. End with a CTA that drives comments (a sharp question the audience genuinely wants to answer).
-10. Add 4–6 relevant hashtags at the end.
+7. Add emotional triggers: curiosity, surprise, relatability, "wait, I didn't know that."
+8. Voice: first-person singular ONLY — "I", "I read", "I tried", "I broke", "I learned", "I finally understood".
+   This is one engineer's personal learning journey. NEVER use the word "we" at all — not "we shipped", not
+   "we're seeing", not even industry-wide "we're pushing context windows further". Rewrite every such line
+   in terms of what YOU personally read, tried, or noticed. Also never "my team", "our", "at my company", or
+   any language implying you lead a team, run a company, or ship products for an org.
+9. Go deep on ONE technical concept — explain it the way you'd explain it to a sharp engineer encountering
+   this specific idea for the first time. Depth and precision over breadth.
+10. End with a CTA that drives comments (a sharp question the audience genuinely wants to answer).
+11. Add 4–6 relevant hashtags at the end.
 
 ━━━ POST STRUCTURE ━━━
 1. Hook (1–2 lines — stop the scroll)
@@ -125,9 +134,11 @@ Research from the web (ground your post in this real, current data):
 ✗ NO generic emojis like 🚀🔥💡 — use sparingly and only if they add meaning
 ✗ NO bold/italic markdown — plain text only (LinkedIn renders asterisks as literals)
 ✗ NEVER present 3 competing ideas — pick ONE insight and go deep
-✗ NEVER write from an analyst perspective — always from someone who built/shipped/broke it
+✗ NEVER write from an analyst perspective — always from someone personally studying/experimenting with it
 ✗ NO business/funding/company content — no valuations, funding rounds, stock moves, market share,
   layoffs, IPOs, or "who is winning" company rivalry framing. Stay on the technology itself.
+✗ NEVER use "we", "my team", "our roadmap", "at my company", or anything implying you lead a team, manage
+  people, or represent an organization's AI strategy. You are one engineer, learning on your own.
 ✓ Always teach something concrete about how the technology actually works (architecture, infra,
   systems, algorithms) — the reader should walk away understanding the tech better, not just the news.
 
@@ -354,8 +365,16 @@ def generate_post(topic: str, tone: str, niche: str, persona: str, research: str
         image_type   = parsed.get("image_type", "none")
         image_prompt = parsed.get("image_prompt", "")
     except (_json.JSONDecodeError, KeyError):
-        print("  [warn] JSON parse failed — using raw model output as post text.")
-        post = raw
+        # Model likely emitted an unescaped quote inside post_text, breaking strict JSON.
+        # Recover just the post_text field via regex instead of dumping raw JSON as the post.
+        match = _re.search(r'"post_text"\s*:\s*"(.*)"\s*,\s*"hook_score"', raw, _re.DOTALL)
+        if match:
+            print("  [warn] JSON parse failed — recovered post_text via regex.")
+            post = match.group(1)
+            post = post.replace('\\n', '\n').replace('\\"', '"').replace('\\\\', '\\')
+        else:
+            print("  [warn] JSON parse failed and post_text not recoverable — using raw model output as post text.")
+            post = raw
 
     # Strip any stray markdown formatting
     post = _re.sub(r'\*{1,3}(.+?)\*{1,3}', r'\1', post)
