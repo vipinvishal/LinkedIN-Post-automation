@@ -121,6 +121,8 @@ Edit `scripts/topics.json` to change:
 - **`niche`** — the content category
 - **`persona`** — the voice and style of the posts
 - **`content_slots`** — topics and tones for each time slot
+- **`portfolio_url`** — if set, this URL is auto-posted as the first comment on every
+  published post (kept out of the post body so it doesn't suppress LinkedIn's organic reach)
 
 ---
 

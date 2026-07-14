@@ -60,6 +60,7 @@ with open(os.path.join(_script_dir, "topics.json"), "r") as f:
 
 NICHE  = _config["niche"]
 PERSONA = _config["persona"]
+PORTFOLIO_URL = _config.get("portfolio_url", "")
 _slot   = _config["content_slots"][CONTENT_SLOT]
 SLOT_LABEL = _slot["label"]
 TOPICS     = _slot["topics"]
@@ -499,6 +500,48 @@ def post_to_linkedin(post_text: str) -> str:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+# STEP 4 — Drop the portfolio link as the first comment
+# ══════════════════════════════════════════════════════════════════════════════
+# Kept out of the post body on purpose: LinkedIn's feed algorithm suppresses
+# reach on posts with an outbound link, but not on comments.
+
+def post_portfolio_comment(post_id: str) -> None:
+    """Add a comment with the portfolio link to the just-published post. Non-fatal on failure."""
+    if not PORTFOLIO_URL:
+        return
+
+    print("[ Step 4 ] Dropping portfolio link as first comment...")
+
+    share_urn = post_id if post_id.startswith("urn:") else f"urn:li:ugcPost:{post_id}"
+    encoded_urn = requests.utils.quote(share_urn, safe="")
+
+    comment_text = f"More of my AI learning notes and projects here: {PORTFOLIO_URL}"
+
+    response = requests.post(
+        f"https://api.linkedin.com/v2/socialActions/{encoded_urn}/comments",
+        headers={
+            "Authorization":             f"Bearer {LINKEDIN_ACCESS_TOKEN}",
+            "Content-Type":              "application/json",
+            "X-Restli-Protocol-Version": "2.0.0",
+        },
+        json={
+            "actor": f"urn:li:person:{LINKEDIN_PERSON_ID}",
+            "message": {"text": comment_text},
+        },
+        timeout=15,
+    )
+
+    if response.status_code in (200, 201):
+        print(f"  Comment posted.\n")
+    else:
+        try:
+            err = response.json()
+        except ValueError:
+            err = response.text
+        print(f"  [warn] Could not post portfolio comment ({response.status_code}): {err}\n")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 # MAIN
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -521,6 +564,8 @@ def main(preview: bool = False):
         post     = generate_post(topic, tone, NICHE, PERSONA, research)
 
         if preview:
+            if PORTFOLIO_URL:
+                print(f"  Would comment: More of my AI learning notes and projects here: {PORTFOLIO_URL}\n")
             print(f"{'='*60}")
             print(f"  PREVIEW ONLY — post NOT published to LinkedIn.")
             print(f"  Run without --preview to publish it.")
@@ -529,6 +574,7 @@ def main(preview: bool = False):
 
         validate_post_length(post, PLATFORM)
         post_id = post_to_linkedin(post)
+        post_portfolio_comment(post_id)
 
         print(f"{'='*60}")
         print(f"  Done! Post published directly to LinkedIn.")
