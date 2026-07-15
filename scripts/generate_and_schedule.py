@@ -117,7 +117,7 @@ Research from the web (ground your post in this real, current data):
    this specific idea for the first time. Depth and precision over breadth.
 10. End with a CTA that drives comments (a sharp question the audience genuinely wants to answer).
 11. Right after the CTA question, add ONE short standalone line pointing to your portfolio — describe it
-    accurately as a portfolio of your work/projects, e.g. "Check out my portfolio & projects → link in the
+    accurately as a portfolio of your work/projects, e.g. "See what I've been building → link in the
     comments." Vary the phrasing naturally each time, but always frame it as a portfolio showcasing work —
     NEVER call it a blog, notes, journal, or "daily updates/deep dives" (it's a static portfolio, not a
     stream of posts). Never spell out the actual URL or domain name in the post text — just say it's in
@@ -565,7 +565,7 @@ def post_portfolio_comment(post_id: str) -> None:
     share_urn = post_id if post_id.startswith("urn:") else f"urn:li:ugcPost:{post_id}"
     encoded_urn = requests.utils.quote(share_urn, safe="")
 
-    comment_text = f"Check out my portfolio & projects here: {PORTFOLIO_URL}"
+    comment_text = f"See what I've been building → {PORTFOLIO_URL}"
 
     response = requests.post(
         f"https://api.linkedin.com/v2/socialActions/{encoded_urn}/comments",
@@ -616,7 +616,7 @@ def main(preview: bool = False):
 
         if preview:
             if PORTFOLIO_URL:
-                print(f"  Would comment: Check out my portfolio & projects here: {PORTFOLIO_URL}\n")
+                print(f"  Would comment: See what I've been building → {PORTFOLIO_URL}\n")
             print(f"{'='*60}")
             print(f"  PREVIEW ONLY — post NOT published to LinkedIn.")
             if png_path:
