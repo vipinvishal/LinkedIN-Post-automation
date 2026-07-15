@@ -164,6 +164,79 @@ Return ONLY valid JSON — no prose, no markdown fences, no explanation before o
 }}
 """.strip()
 
+LISTICLE_POST_PROMPT = """
+━━━ INPUT ━━━
+Persona      : {persona}
+Content slot : {slot_label}
+Topic        : {topic}
+Tone         : {tone}
+
+Research from the web (ground your post in this real, current data):
+{research}
+
+━━━ FORMAT: STRUCTURED LISTICLE BREAKDOWN ━━━
+This post breaks ONE topic into a clear enumerated list (types, steps, patterns, or common mistakes) —
+the goal is a highly skimmable, saveable, screenshot-worthy reference post, not a personal story.
+
+━━━ WRITING RULES ━━━
+1. Open with a contrarian misconception hook, exactly this shape:
+   "Most people think [common assumption]. But [the actual, more precise truth]." A first-person variant
+   like "I used to think..." also works — either way it must sound like something a real person concluded,
+   not a textbook.
+2. One short setup line introducing the list: "Here are the N [types/steps/patterns] of [topic]:"
+3. Enumerate 4-6 items. Each item:
+   - one relevant emoji + a short label (2-4 words)
+   - 2-3 short arrow bullets ("→ ...") explaining it — fragments, not full sentences, max ~12 words each
+4. Close with a misconception-correction pair:
+   "✕ [the wrong/oversimplified framing]"
+   "✓ [the correct, more precise framing]"
+5. One short first-person takeaway line tying it back to why it matters practically.
+6. End with ONE short comment-driving question (specific, answerable, inviting people to share their
+   own experience or opinion on the list above).
+7. Right after that, add ONE short standalone line pointing to your portfolio — describe it accurately
+   as a portfolio of your work/projects, e.g. "See what I've been building → link in the comments."
+   Never spell out the actual URL or domain name in the post text — just say it's in the comments.
+8. Do NOT add hashtags to this format.
+
+━━━ POST STRUCTURE ━━━
+1. Contrarian hook (1-2 lines)
+2. Setup line ("Here are the N types of X:")
+3. N enumerated items (emoji + label + arrow bullets)
+4. Misconception correction (✕ / ✓)
+5. One-line takeaway
+6. CTA (comment-driving question)
+7. Portfolio mention (one short line, no raw URL)
+
+━━━ CONTENT RULES ━━━
+✓ Max 3000 characters TOTAL
+✓ Every bullet must be specific and technically accurate — no vague filler
+✓ Emojis are allowed ONLY as the one-per-item category marker and the ✕/✓ correction pair — nothing else
+✗ NO hype language ("game-changing", "revolutionary", "the future is here")
+✗ NO bold/italic markdown — plain text only (LinkedIn renders asterisks as literals)
+✗ NO business/funding/company content — no valuations, funding rounds, stock moves, market share,
+  layoffs, IPOs, or "who is winning" company rivalry framing. Stay on the technology itself.
+✗ NEVER use "we", "my team", "our roadmap", "at my company", or anything implying you lead a team, manage
+  people, or represent an organization's AI strategy. You are one engineer, learning on your own.
+✗ NEVER write out the actual portfolio URL or domain name in the post — outbound links in the post body
+  suppress LinkedIn's reach. Only reference it indirectly ("link in the comments").
+✓ Pick a topic that genuinely enumerates well (types, steps, patterns, common mistakes) — if the given
+  topic doesn't naturally break into a list, find the closest enumerable angle within it.
+
+━━━ OUTPUT ━━━
+Return ONLY valid JSON — no prose, no markdown fences, no explanation before or after:
+{{
+  "post_text": "the full LinkedIn post (no hashtags)",
+  "hook_score": <1-10 how likely this hook stops the scroll>,
+  "viral_score": <1-10 overall viral potential>,
+  "image_recommended": <true or false>,
+  "image_type": "<infographic|meme|carousel|chart|none>",
+  "image_prompt": "<detailed prompt for generating the image, or empty string if none>"
+}}
+""".strip()
+
+# Slots where the topic naturally enumerates into types/steps/patterns — eligible for the listicle format
+_LISTICLE_ELIGIBLE_SLOTS = {"educational", "advanced"}
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # GEMINI RETRY + FALLBACK CHAIN  (key1 → key2 → Euron)
@@ -345,9 +418,12 @@ def generate_post(topic: str, tone: str, niche: str, persona: str, research: str
     import re as _re
     import json as _json
 
-    print("[ Step 2 ] Generating post with Gemini...")
+    use_listicle = CONTENT_SLOT in _LISTICLE_ELIGIBLE_SLOTS and random.random() < 0.5
+    template = LISTICLE_POST_PROMPT if use_listicle else VIRAL_POST_PROMPT
 
-    prompt = VIRAL_POST_PROMPT.format(
+    print(f"[ Step 2 ] Generating post with Gemini... (format: {'listicle' if use_listicle else 'narrative'})")
+
+    prompt = template.format(
         persona=persona,
         slot_label=SLOT_LABEL,
         topic=topic,
