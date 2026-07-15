@@ -3,349 +3,225 @@
 <head>
 <meta charset="UTF-8">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { width: 900px; overflow: hidden; }
+  body { width: 1080px; overflow: hidden; }
+
+  :root {
+    --bg:     #0b0f1a;
+    --panel:  #131a2b;
+    --accent: #34e7a1;
+    --white:  #f5f7fa;
+    --slate:  #8b96a8;
+    --line:   rgba(255,255,255,0.09);
+  }
 
   .page {
-    width: 900px; height: 900px;
-    background-color: #f2ead4;
-    background-image: repeating-linear-gradient(
-      to bottom, transparent 0px, transparent 29px,
-      #acc6de 29px, #acc6de 30px
-    );
-    font-family: 'Caveat', cursive;
+    width: 1080px; height: 1350px;
+    background: var(--bg);
     position: relative; overflow: hidden;
-    border: 6px solid #18100a;
+    font-family: 'Inter', sans-serif;
   }
 
-  /* ── rings ── */
-  .rings-col {
-    position: absolute; left: 0; top: 0; bottom: 0; width: 56px;
-    background: #ece0bf; border-right: 3px solid #2a1a14; z-index: 3;
-  }
-  .ring {
-    position: absolute; left: 8px; width: 40px; height: 23px;
-    border: 4px solid #2a1a14; border-radius: 50%;
-    border-bottom-color: transparent; border-left-color: transparent;
-    transform: rotate(-20deg);
-  }
-
-  /* ── main content area starts after rings ── */
-  .content { position: absolute; left: 56px; top: 0; right: 0; bottom: 0; }
-
-  /* ── node label box ── */
-  .node-label {
-    display: inline-block;
-    border: 3.5px solid #1a1010;
-    padding: 5px 16px;
-    font-size: 36px; font-weight: 700; color: #1a1010;
-    letter-spacing: 0.3px;
-    background: rgba(242,234,212,0.6);
+  /* subtle grid texture */
+  .grid-bg {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 54px 54px;
+    opacity: 0.5;
+    mask-image: linear-gradient(to bottom, black, black 70%, transparent 100%);
   }
 
-  /* ── bullet points (outside the label box) ── */
-  .node-pts { list-style: none; margin-top: 9px; margin-left: 5px; }
-  .node-pts li { font-size: 28px; color: #1a1010; line-height: 1.4; }
-  .node-pts li::before { content: "• "; }
+  .content { position: absolute; left: 64px; top: 0; right: 64px; bottom: 0; }
 
-  /* ── each node is absolutely positioned ── */
-  .node { position: absolute; }
+  /* ── eyebrow tag ── */
+  .eyebrow {
+    position: absolute; left: 0; top: 56px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .eyebrow-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .eyebrow span {
+    font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 21px;
+    color: var(--accent); letter-spacing: 0.5px;
+  }
+
+  /* ── headline ── */
+  .headline { position: absolute; left: 0; top: 96px; width: 952px; }
+  .h-line {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 68px;
+    line-height: 1.08; letter-spacing: -0.5px;
+  }
+  .h-line.l1 { color: var(--white); }
+  .h-line.l2 { color: var(--accent); }
+
+  /* ── hook / terminal comment ── */
+  .hook-row { position: absolute; left: 0; top: 0; width: 952px; display: flex; gap: 10px; align-items: flex-start; }
+  .hook-row .bar { color: var(--slate); font-family: 'JetBrains Mono', monospace; font-size: 22px; flex-shrink: 0; }
+  .hook-text {
+    font-family: 'JetBrains Mono', monospace; font-weight: 400; font-size: 22px;
+    color: var(--slate); line-height: 1.45;
+  }
+
+  .hr { position: absolute; left: 0; width: 952px; height: 1px; background: var(--line); }
+
+  /* ── step rows ── */
+  .step { position: absolute; left: 0; width: 952px; }
+  .step-inner { display: flex; gap: 26px; align-items: flex-start; position: relative; padding-left: 20px; }
+  .step-bar { position: absolute; left: 0; top: 4px; bottom: 10px; width: 4px; border-radius: 3px; background: var(--accent); }
+  .step-num {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 46px;
+    color: var(--accent); width: 92px; flex-shrink: 0; line-height: 1;
+  }
+  .step-title {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 32px;
+    color: var(--white); margin-bottom: 12px; letter-spacing: 0.2px;
+  }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    font-family: 'Inter', sans-serif; font-weight: 500; font-size: 18px;
+    color: var(--slate); background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: 6px 12px; white-space: nowrap;
+  }
 
   /* ── footer ── */
-  .fi {
-    width: 30px; height: 30px; border: 3px solid #555;
-    border-radius: 8px; position: relative; flex-shrink: 0;
+  .footer { position: absolute; left: 0; bottom: 54px; width: 952px; }
+  .footer-tag {
+    font-family: 'Inter', sans-serif; font-weight: 500; font-size: 20px;
+    color: var(--slate);
   }
-  .fi::before {
-    content: ''; position: absolute; left: 50%; top: 50%;
-    transform: translate(-50%,-50%);
-    width: 14px; height: 14px; border: 2.5px solid #555; border-radius: 50%;
-  }
-  .fi::after {
-    content: ''; position: absolute; right: 5px; top: 5px;
-    width: 4px; height: 4px; background: #555; border-radius: 50%;
+
+  /* corner mark */
+  .corner-mark {
+    position: absolute; right: 0; top: 60px;
+    font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 24px;
+    color: var(--slate); border: 1.5px solid var(--line); border-radius: 8px;
+    padding: 8px 14px;
   }
 </style>
 </head>
 <body>
 <div class="page">
+  <div class="grid-bg"></div>
 
-  <!-- Rings column -->
-  <div class="rings-col">
-    {% for i in range(14) %}<div class="ring" style="top:{{ 16 + i*62 }}px"></div>{% endfor %}
-  </div>
-
-  <!--
-    SVG overlay — coordinates: x=0 == page-x=56 (rings edge)
-    Arrows are injected by JS after fonts load.
-    Static decorations: bar chart, pencil, dashed lines.
-    Dynamic decorations: lightbulb, 3 bottom charts — initially hidden, positioned by JS.
-  -->
-  <svg id="isvg"
-       style="position:absolute;left:56px;top:0;pointer-events:none;overflow:visible;z-index:4"
-       width="844" height="900" viewBox="0 0 844 900">
-    <defs>
-      <filter id="rgh" x="-8%" y="-15%" width="116%" height="130%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.038" numOctaves="3" result="n" seed="7"/>
-        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
-      </filter>
-      <marker id="arr" markerWidth="14" markerHeight="9" refX="11" refY="4.5" orient="auto">
-        <polygon points="0 0.5, 12 4.5, 0 8.5" fill="#1a1010"/>
-      </marker>
-    </defs>
-
-    <!-- ── Bar chart (top-right, always fixed) ── -->
-    <g transform="translate(648,14)" filter="url(#rgh)">
-      <rect x="0"  y="58" width="16" height="18" stroke="#1a1010" stroke-width="2.4" fill="none"/>
-      <rect x="20" y="44" width="16" height="32" stroke="#1a1010" stroke-width="2.4" fill="none"/>
-      <rect x="40" y="30" width="16" height="46" stroke="#1a1010" stroke-width="2.4" fill="none"/>
-      <rect x="60" y="16" width="16" height="60" stroke="#1a1010" stroke-width="2.4" fill="none"/>
-      <rect x="80" y="2"  width="16" height="74" stroke="#1a1010" stroke-width="2.4" fill="none"/>
-      <path d="M4 64 Q46 30 102 4" stroke="#1a1010" stroke-width="3" fill="none" marker-end="url(#arr)"/>
-    </g>
-
-    <!-- ── Pencil (right side, between top and bottom row) ── -->
-    <g id="pencil-g" transform="translate(0,0)" filter="url(#rgh)">
-      <!-- will be repositioned by JS -->
-    </g>
-
-    <!-- ── Dashed lines (right column, between CONTENT and ANALYTICS) ── -->
-    <g id="dash-g" transform="translate(0,0)" opacity="0">
-      <line x1="0" y1="0"  x2="42" y2="0"  stroke="#1a1010" stroke-width="2.2" stroke-dasharray="6,4"/>
-      <line x1="0" y1="12" x2="34" y2="12" stroke="#1a1010" stroke-width="2.2" stroke-dasharray="6,4"/>
-      <line x1="0" y1="24" x2="24" y2="24" stroke="#1a1010" stroke-width="2.2" stroke-dasharray="6,4"/>
-    </g>
-
-    <!-- ── Lightbulb (repositioned by JS) ── -->
-    <g id="lb" transform="translate(-200,-200)" filter="url(#rgh)">
-      <path d="M26 52 C8 44 2 30 2 20 C2 6 12 0 26 0 C40 0 50 6 50 20 C50 30 44 44 26 52Z"
-            stroke="#1a1010" stroke-width="2.8" fill="none"/>
-      <line x1="16" y1="55" x2="36" y2="55" stroke="#1a1010" stroke-width="2.6"/>
-      <line x1="18" y1="62" x2="34" y2="62" stroke="#1a1010" stroke-width="2.6"/>
-      <path d="M22 70 Q26 78 30 70" stroke="#1a1010" stroke-width="2.6" fill="none"/>
-      <line x1="26" y1="-5"  x2="26" y2="-14" stroke="#1a1010" stroke-width="2.2"/>
-      <line x1="8"  y1="7"   x2="2"  y2="0"   stroke="#1a1010" stroke-width="2.2"/>
-      <line x1="44" y1="7"   x2="50" y2="0"   stroke="#1a1010" stroke-width="2.2"/>
-    </g>
-
-    <!-- ── Pencil icon (repositioned by JS) ── -->
-    <g id="pencil" transform="translate(-200,-200)" filter="url(#rgh)">
-      <rect x="0" y="0"  width="16" height="10" stroke="#1a1010" stroke-width="2.2" fill="none"/>
-      <rect x="0" y="10" width="16" height="68" stroke="#1a1010" stroke-width="2.2" fill="none"/>
-      <polygon points="0,78 16,78 8,96" stroke="#1a1010" stroke-width="2.2" fill="none"/>
-    </g>
-
-    <!-- ── Bottom deco A: wavy lines (repositioned by JS) ── -->
-    <g id="deco-a" transform="translate(-200,-200)" filter="url(#rgh)">
-      <path d="M0 0 Q14 -9 28 0 Q42 9 56 0 Q70 -9 84 0"  stroke="#1a1010" stroke-width="2.4" fill="none"/>
-      <path d="M0 14 Q14 5 28 14 Q42 23 56 14 Q70 5 84 14" stroke="#1a1010" stroke-width="2.4" fill="none"/>
-      <path d="M0 28 Q12 19 24 28 Q36 37 48 28 Q60 19 72 28" stroke="#1a1010" stroke-width="2.4" fill="none"/>
-    </g>
-
-    <!-- ── Bottom deco B: zigzag growth chart (repositioned by JS) ── -->
-    <g id="deco-b" transform="translate(-200,-200)" filter="url(#rgh)">
-      <line x1="0" y1="60" x2="138" y2="60" stroke="#1a1010" stroke-width="2"/>
-      <line x1="0" y1="60" x2="0"   y2="0"  stroke="#1a1010" stroke-width="2"/>
-      <polyline points="4,56 18,42 34,48 52,30 70,36 90,18 112,22 132,4"
-                stroke="#1a1010" stroke-width="2.4" fill="none"/>
-      <polygon points="132,4 128,14 136,14" fill="#1a1010"/>
-    </g>
-
-    <!-- ── Bottom deco C: smooth growth curve (repositioned by JS) ── -->
-    <g id="deco-c" transform="translate(-200,-200)" filter="url(#rgh)">
-      <line x1="0" y1="60" x2="128" y2="60" stroke="#1a1010" stroke-width="2"/>
-      <line x1="0" y1="60" x2="0"   y2="0"  stroke="#1a1010" stroke-width="2"/>
-      <path d="M4 56 Q30 36 54 40 Q78 22 124 4"
-            stroke="#1a1010" stroke-width="2.4" fill="none" marker-end="url(#arr)"/>
-    </g>
-
-  </svg>
-
-  <!-- ── HTML text content ── -->
   <div class="content">
 
-    <!-- Header -->
-    <div style="position:absolute;left:18px;top:18px;display:flex;align-items:center;gap:18px">
-      <div style="border:3.5px solid #1a1010;width:68px;height:68px;display:flex;
-                  align-items:center;justify-content:center;font-size:28px;font-weight:700;
-                  color:#1a1010;flex-shrink:0;letter-spacing:-1px">in</div>
-      <div>
-        <div id="t1" style="font-size:52px;font-weight:700;color:#1a1010;line-height:1.0">{{ title_line1 }}</div>
-        <div id="t2" style="font-size:52px;font-weight:700;color:#1a1010;line-height:1.0">{{ title_line2 }}</div>
+    <!-- eyebrow -->
+    <div class="eyebrow">
+      <div class="eyebrow-dot"></div>
+      <span>AI SYSTEMS // DAILY NOTES</span>
+    </div>
+
+    <!-- corner mark -->
+    <div class="corner-mark">&lt;/&gt;</div>
+
+    <!-- headline -->
+    <div class="headline">
+      <div id="h1" class="h-line l1">{{ title_line1 }}</div>
+      <div id="h2" class="h-line l2">{{ title_line2 }}</div>
+    </div>
+
+    <!-- hook (terminal-comment style), positioned by JS below headline -->
+    <div class="hook-row" id="hookRow">
+      <span class="bar">//</span>
+      <span class="hook-text" id="hookText">{{ hook }}</span>
+    </div>
+
+    <div class="hr" id="hr1"></div>
+
+    <!-- Step rows: box1..box5 rendered as a sequential 1-5 vertical flow -->
+    {% set steps = [box1, box2, box3, box4, box5] %}
+    {% for b in steps %}
+    <div class="step" id="step{{ loop.index }}">
+      <div class="step-inner">
+        <div class="step-bar"></div>
+        <div class="step-num">{{ '%02d' % loop.index }}</div>
+        <div>
+          <div class="step-title">{{ b.label }}</div>
+          <div class="pills">{% for p in b.points %}<div class="pill">{{ p }}</div>{% endfor %}</div>
+        </div>
       </div>
     </div>
-
-    <!-- TOP-LEFT: box1 -->
-    <div class="node" id="node1" style="left:18px;top:150px">
-      <div class="node-label">{{ box1.label }}</div>
-      <ul class="node-pts">{% for p in box1.points %}<li>{{ p }}</li>{% endfor %}</ul>
-    </div>
-
-    <!-- TOP-RIGHT: box2 -->
-    <div class="node" id="node2" style="left:500px;top:150px">
-      <div class="node-label">{{ box2.label }}</div>
-      <ul class="node-pts">{% for p in box2.points %}<li>{{ p }}</li>{% endfor %}</ul>
-    </div>
-
-    <!-- CENTER: box4 (ENGAGEMENT equivalent) -->
-    <div class="node" id="node4" style="left:250px;top:368px">
-      <div class="node-label">{{ box4.label }}</div>
-      <ul class="node-pts">{% for p in box4.points %}<li>{{ p }}</li>{% endfor %}</ul>
-    </div>
-
-    <!-- BOTTOM-LEFT: box3 -->
-    <div class="node" id="node3" style="left:18px;top:608px">
-      <div class="node-label">{{ box3.label }}</div>
-      <ul class="node-pts">{% for p in box3.points %}<li>{{ p }}</li>{% endfor %}</ul>
-    </div>
-
-    <!-- BOTTOM-RIGHT: box5 -->
-    <div class="node" id="node5" style="left:500px;top:608px">
-      <div class="node-label">{{ box5.label }}</div>
-      <ul class="node-pts">{% for p in box5.points %}<li>{{ p }}</li>{% endfor %}</ul>
-    </div>
+    {% endfor %}
 
     <!-- Footer -->
-    <div style="position:absolute;bottom:14px;right:16px;display:flex;align-items:center;gap:8px">
-      <div class="fi"></div>
-      <span style="font-size:22px;color:#555;font-style:italic">{{ handle }}</span>
+    <div class="footer">
+      <div class="footer-tag">Daily notes on the tech behind AI — systems, models, infra</div>
     </div>
 
   </div>
 </div>
 
 <script>
-// ─────────────────────────────────────────────────────────────────────────────
-// drawInfographic() — called by render.py after fonts are loaded.
-// Measures real element positions then draws all arrows + positions decos.
-// ─────────────────────────────────────────────────────────────────────────────
 window._infoDone = false;
 
 window.drawInfographic = function() {
   if (window._infoDone) return;
   window._infoDone = true;
 
-  var page = document.querySelector('.page');
-  var svg  = document.getElementById('isvg');
-  var pr   = page.getBoundingClientRect();
-  var SL   = 56;   // rings column width (SVG x-origin offset)
-  var GAP  = 5;    // arrowhead clearance from box edge
-  var NS   = 'http://www.w3.org/2000/svg';
-
-  // ── Shrink labels that overflow ──────────────────────────────────
-  document.querySelectorAll('.node-label').forEach(function(el) {
-    var sz = parseFloat(getComputedStyle(el).fontSize);
-    while (el.scrollWidth > el.parentElement.clientWidth - 4 && sz > 18) {
-      sz--; el.style.fontSize = sz + 'px';
-    }
-  });
-
-  // ── Shrink title lines ───────────────────────────────────────────
-  ['t1','t2'].forEach(function(id) {
+  // ── Shrink headline lines if too wide ──
+  ['h1','h2'].forEach(function(id) {
     var el = document.getElementById(id);
     if (!el) return;
     var sz = parseFloat(getComputedStyle(el).fontSize);
-    while (el.scrollWidth > 560 && sz > 28) { sz--; el.style.fontSize = sz + 'px'; }
+    while (el.scrollWidth > 952 && sz > 34) { sz--; el.style.fontSize = sz + 'px'; }
   });
 
-  // ── Helper: label-box rect in SVG coordinates ─────────────────────
-  function labelRect(nodeId) {
-    var el = document.querySelector('#' + nodeId + ' .node-label');
-    var r  = el.getBoundingClientRect();
-    var L = r.left   - pr.left - SL;
-    var T = r.top    - pr.top;
-    var R = r.right  - pr.left - SL;
-    var B = r.bottom - pr.top;
-    return { L:L, T:T, R:R, B:B, cx:(L+R)/2, cy:(T+B)/2, w:r.width, h:r.height };
+  // ── Shrink step titles if too wide ──
+  document.querySelectorAll('.step-title').forEach(function(el) {
+    var sz = parseFloat(getComputedStyle(el).fontSize);
+    while (el.scrollWidth > 800 && sz > 20) { sz--; el.style.fontSize = sz + 'px'; }
+  });
+
+  var pr       = document.querySelector('.page').getBoundingClientRect();
+  var headline = document.querySelector('.headline');
+  var hookRow  = document.getElementById('hookRow');
+  var hr1      = document.getElementById('hr1');
+
+  // ── Position hook row right under the headline ──
+  var hH = headline.getBoundingClientRect().height;
+  var headlineTop = 96;
+  var hookTop = headlineTop + hH + 22;
+  hookRow.style.top = hookTop + 'px';
+
+  var hookH = hookRow.getBoundingClientRect().height;
+  var hrTop = hookTop + hookH + 30;
+  hr1.style.top = hrTop + 'px';
+
+  // ── Distribute the 5 step rows evenly across the space between the divider
+  //     and the footer, so the layout always fills the canvas regardless of
+  //     how much text each step wraps to. ──
+  var steps = [];
+  var totalH = 0;
+  for (var i = 1; i <= 5; i++) {
+    var el = document.getElementById('step' + i);
+    var h = el.getBoundingClientRect().height;
+    steps.push({ el: el, h: h });
+    totalH += h;
   }
 
-  // ── Helper: full node (label + bullets) bottom in SVG coords ──────
-  function nodeBottom(nodeId) {
-    var el = document.getElementById(nodeId);
-    var r  = el.getBoundingClientRect();
-    return r.bottom - pr.top;
+  var footerEl  = document.querySelector('.footer');
+  var footerTop = footerEl.getBoundingClientRect().top - pr.top;
+  var startY    = hrTop + 44;
+  var endY      = footerTop - 50;
+  var gapCount  = steps.length - 1;
+  var gap       = Math.max(34, (endY - startY - totalH) / gapCount);
+
+  var y = startY;
+  for (var j = 0; j < steps.length; j++) {
+    steps[j].el.style.top = y + 'px';
+    y += steps[j].h + gap;
+    if (j < steps.length - 1) {
+      var div = document.createElement('div');
+      div.className = 'hr';
+      div.style.top = (y - gap / 2) + 'px';
+      document.querySelector('.content').appendChild(div);
+    }
   }
-
-  var n1 = labelRect('node1'), n2 = labelRect('node2'),
-      n3 = labelRect('node3'), n4 = labelRect('node4'), n5 = labelRect('node5');
-  var b1 = nodeBottom('node1'), b3 = nodeBottom('node3'),
-      b4 = nodeBottom('node4'), b5 = nodeBottom('node5');
-
-  // ── Lightbulb: centered between n1.R and n2.L ─────────────────────
-  var lbcx = (n1.R + n2.L) / 2;
-  var lbcy = n1.cy;
-  document.getElementById('lb').setAttribute('transform',
-    'translate(' + (lbcx - 26) + ',' + (lbcy - 34) + ')');
-
-  // ── Pencil: right side, vertically between top row and bottom row ──
-  var pcy = (n1.cy + n3.cy) / 2;
-  document.getElementById('pencil').setAttribute('transform',
-    'translate(774,' + (pcy - 50) + ') rotate(20)');
-
-  // ── Dashed lines: right of n2 column, between n2 and n5 ───────────
-  var dashX = n2.R + 14;
-  var dashY = (n2.B + n5.T) / 2 - 12;
-  if (dashX < 740) dashX = 740;
-  document.getElementById('dash-g').setAttribute('transform',
-    'translate(' + dashX + ',' + dashY + ')');
-  document.getElementById('dash-g').setAttribute('opacity', '1');
-
-  // ── Bottom decos: placed below the lowest node ─────────────────────
-  var decoY = Math.max(b3, b4, b5) + 20;
-  // (A) wavy lines under n3
-  document.getElementById('deco-a').setAttribute('transform',
-    'translate(' + n3.L + ',' + decoY + ')');
-  // (B) zigzag chart under n4 center
-  document.getElementById('deco-b').setAttribute('transform',
-    'translate(' + (n4.cx - 70) + ',' + decoY + ')');
-  // (C) smooth curve under n5
-  document.getElementById('deco-c').setAttribute('transform',
-    'translate(' + n5.L + ',' + decoY + ')');
-
-  // ── Arrow helper ───────────────────────────────────────────────────
-  function addArrow(x1, y1, x2, y2) {
-    var line = document.createElementNS(NS, 'line');
-    line.setAttribute('x1', x1.toFixed(1));
-    line.setAttribute('y1', y1.toFixed(1));
-    line.setAttribute('x2', x2.toFixed(1));
-    line.setAttribute('y2', y2.toFixed(1));
-    line.setAttribute('stroke', '#1a1010');
-    line.setAttribute('stroke-width', '2.8');
-    line.setAttribute('marker-end', 'url(#arr)');
-    line.setAttribute('filter', 'url(#rgh)');
-    svg.appendChild(line);
-  }
-
-  // ── ① Long horizontal arrow just above the top row ────────────────
-  addArrow(18, n1.T - 9, 810, n1.T - 9);
-
-  // ── ② n1 right edge → lightbulb left ─────────────────────────────
-  addArrow(n1.R + GAP, n1.cy, lbcx - 29, lbcy + 6);
-
-  // ── ③ lightbulb bottom → n4 top ──────────────────────────────────
-  addArrow(lbcx, lbcy + 44, n4.cx, n4.T - GAP);
-
-  // ── ④ n3 right edge → n4 left edge (horizontal) ──────────────────
-  addArrow(n3.R + GAP, n3.cy, n4.L - GAP, n4.cy);
-
-  // ── ⑤ Up arrow left column (n3 top → n1 full-node bottom) ─────────
-  var ux = n3.L + 22;
-  addArrow(ux, n3.T - GAP, ux, b1 + GAP);
-
-  // ── ⑥ n4 right edge → n5 left edge (horizontal) ──────────────────
-  addArrow(n4.R + GAP, n4.cy, n5.L - GAP, n5.cy);
-
-  // ── ⑦ n2 bottom → n5 top (vertical, same x-center) ───────────────
-  var dx = n2.cx;
-  addArrow(dx, n2.B + GAP, dx, n5.T - GAP);
-
-  // ── ⑧ n4 full bottom → center chart ──────────────────────────────
-  addArrow(n4.cx, b4 + GAP, n4.cx, decoY - GAP);
 };
 
-// Auto-trigger once fonts are ready (fallback for direct browser open)
 document.fonts.ready.then(function() { window.drawInfographic(); });
 </script>
 </body>

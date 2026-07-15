@@ -116,7 +116,10 @@ Research from the web (ground your post in this real, current data):
 9. Go deep on ONE technical concept — explain it the way you'd explain it to a sharp engineer encountering
    this specific idea for the first time. Depth and precision over breadth.
 10. End with a CTA that drives comments (a sharp question the audience genuinely wants to answer).
-11. Add 4–6 relevant hashtags at the end.
+11. Right after the CTA question, add ONE short standalone line pointing to the portfolio — something like
+    "More of my work / projects → link in the comments." Vary the phrasing naturally each time, but never
+    spell out the actual URL or domain name in the post text itself — just say it's in the comments.
+12. Add 4–6 relevant hashtags at the end.
 
 ━━━ POST STRUCTURE ━━━
 1. Hook (1–2 lines — stop the scroll)
@@ -124,7 +127,8 @@ Research from the web (ground your post in this real, current data):
 3. Main insight (3–7 short punchy points or a tight story)
 4. Personal opinion or takeaway
 5. CTA (comment-driving question)
-6. Hashtags
+6. Portfolio mention (one short line, no raw URL — "link in the comments" style)
+7. Hashtags
 
 ━━━ CONTENT RULES ━━━
 ✓ Max 3000 characters TOTAL (including hashtags)
@@ -140,6 +144,8 @@ Research from the web (ground your post in this real, current data):
   layoffs, IPOs, or "who is winning" company rivalry framing. Stay on the technology itself.
 ✗ NEVER use "we", "my team", "our roadmap", "at my company", or anything implying you lead a team, manage
   people, or represent an organization's AI strategy. You are one engineer, learning on your own.
+✗ NEVER write out the actual portfolio URL or domain name in the post — outbound links in the post body
+  suppress LinkedIn's reach. Only reference it indirectly ("link in the comments").
 ✓ Always teach something concrete about how the technology actually works (architecture, infra,
   systems, algorithms) — the reader should walk away understanding the tech better, not just the news.
 
@@ -420,11 +426,45 @@ def generate_post(topic: str, tone: str, niche: str, persona: str, research: str
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+# STEP 2.5 — Generate & render infographic (optional, graceful fallback)
+# ══════════════════════════════════════════════════════════════════════════════
+
+INCLUDE_INFOGRAPHIC = os.environ.get("INCLUDE_INFOGRAPHIC", "1") == "1"
+_PNG_PATH = os.path.join(_script_dir, "..", "renderer", "output", "infographic.png")
+
+
+def build_infographic(topic: str, research: str) -> str | None:
+    """Generate infographic content + render PNG. Returns local PNG path, or None on failure."""
+    if not INCLUDE_INFOGRAPHIC:
+        return None
+
+    try:
+        import sys as _sys, pathlib as _pl
+        _root = str(_pl.Path(__file__).parent.parent)
+        if _root not in _sys.path:
+            _sys.path.insert(0, _root)
+        import scripts.infographic as ig
+    except ImportError:
+        print("  [infographic] skipped — scripts.infographic not importable.")
+        return None
+
+    print("[ Step 2.5 ] Generating infographic...")
+    try:
+        content = ig.generate_content(topic, research, generate_text)
+        png     = ig.render_infographic(content, _PNG_PATH)
+        print(f"  Infographic rendered: {png}\n")
+        return png
+    except Exception as exc:
+        print(f"  [infographic] WARNING: failed ({exc}) — posting text-only.\n")
+        return None
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 # STEP 3 — Post directly to LinkedIn
 # ══════════════════════════════════════════════════════════════════════════════
 
-def post_to_linkedin(post_text: str) -> str:
-    """Publish the post directly to LinkedIn."""
+def post_to_linkedin(post_text: str, image_urn: str = None) -> str:
+    """Publish the post directly to LinkedIn. Attaches image if image_urn provided."""
     print("[ Step 3 ] Posting to LinkedIn...")
 
     if not LINKEDIN_ACCESS_TOKEN:
@@ -442,7 +482,14 @@ def post_to_linkedin(post_text: str) -> str:
 
     author_urn = f"urn:li:person:{LINKEDIN_PERSON_ID}"
 
-    share_content = {
+    if image_urn:
+        share_content = {
+            "shareCommentary":    {"text": post_text},
+            "shareMediaCategory": "IMAGE",
+            "media": [{"status": "READY", "media": image_urn}],
+        }
+    else:
+        share_content = {
             "shareCommentary":    {"text": post_text},
             "shareMediaCategory": "NONE",
         }
@@ -562,22 +609,35 @@ def main(preview: bool = False):
     try:
         research = research_topic(topic, NICHE)
         post     = generate_post(topic, tone, NICHE, PERSONA, research)
+        png_path = build_infographic(topic, research)
 
         if preview:
             if PORTFOLIO_URL:
                 print(f"  Would comment: More of my AI learning notes and projects here: {PORTFOLIO_URL}\n")
             print(f"{'='*60}")
             print(f"  PREVIEW ONLY — post NOT published to LinkedIn.")
+            if png_path:
+                print(f"  Infographic preview saved to: {png_path}")
             print(f"  Run without --preview to publish it.")
             print(f"{'='*60}\n")
             return
 
         validate_post_length(post, PLATFORM)
-        post_id = post_to_linkedin(post)
+
+        image_urn = None
+        if png_path:
+            try:
+                import scripts.infographic as ig
+                image_urn = ig.upload_to_linkedin(png_path, LINKEDIN_ACCESS_TOKEN, LINKEDIN_PERSON_ID)
+            except Exception as exc:
+                print(f"  [infographic] WARNING: upload failed ({exc}) — posting text-only.\n")
+
+        post_id = post_to_linkedin(post, image_urn=image_urn)
         post_portfolio_comment(post_id)
 
         print(f"{'='*60}")
         print(f"  Done! Post published directly to LinkedIn.")
+        print(f"  Image attached    : {'yes' if image_urn else 'no (text-only)'}")
         print(f"  LinkedIn Post ID : {post_id}")
         print(f"{'='*60}\n")
 

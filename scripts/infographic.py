@@ -2,7 +2,7 @@
 Infographic generator for LinkedIn posts.
 
 Pipeline:
-  generate_content()  → Gemini → 5-box content dict
+  generate_content()  → Gemini → 5-step content dict
   render_infographic()  → Playwright → PNG
   upload_to_linkedin()  → LinkedIn media API → asset URN
 """
@@ -13,31 +13,32 @@ import json
 import pathlib
 import requests
 
-INFOGRAPHIC_HANDLE = os.environ.get("INFOGRAPHIC_HANDLE", "@VipinAIHub")
-
 _CONTENT_PROMPT = """
-Generate content for a hand-drawn sketchbook flowchart infographic about an AI topic.
-
-LAYOUT — 5 nodes connected by arrows (like the LinkedIn 30-day plan style):
-- box1 (top-left)    : Starting point / context / input
-- box2 (top-right)   : Output / result / what you get
-- box4 (CENTER)      : Core process / main concept (the hub everything connects through)
-- box3 (bottom-left) : Supporting input / resource / feed-in element
-- box5 (bottom-right): Measurement / tracking / outcome
+Generate content for a dark-mode, high-contrast LinkedIn infographic breaking an AI/tech topic into
+a clear 5-step sequential mental model (STEP 1 → STEP 2 → STEP 3 → STEP 4 → STEP 5, read top to bottom).
+This is for an individual engineer's personal learning post — technical, precise, no business framing.
+Write for someone scrolling fast on mobile: the headline must stop the scroll, and each step must be
+understandable in under 2 seconds.
 
 Topic: {topic}
 Research context: {research}
 
 STRICT RULES:
-- All box labels : 1–2 words, ALL CAPS (e.g. "STRATEGY", "RESULTS", "ANALYTICS")
-- All box points : exactly 3 items, max 4 words each — keep short and punchy
-- title_line1 : first 2–3 words of the topic, ALL CAPS
-- title_line2 : remaining words, ALL CAPS (split so each line is similar length)
+- box1..box5 : five sequential steps that build a real mental model of the topic, step 1 is the
+  simplest entry point, step 5 is the payoff / end state. Each must teach something concrete.
+- All box labels : 1–2 words, ALL CAPS (e.g. "RETRIEVAL", "LATENCY", "GPU MEMORY")
+- All box points : exactly 3 items, max 3 words each — short tag-like phrases, plain text (no markdown)
+- title_line1 : a short, punchy, curiosity-driving hook phrase (3-5 words), NOT the raw topic name.
+  Should read like a scroll-stopping headline, e.g. "WHY YOUR RAG" not "Retrieval Augmented Generation".
+- title_line2 : the payoff / rest of the hook (3-5 words), ALL CAPS, completes the headline from line1.
+- hook : one short punchy sentence (max 14 words) — a surprising fact or the single most important
+  takeaway. Written like a terminal code comment. Plain text, not ALL CAPS.
 
 Return ONLY valid JSON — no markdown, no explanation:
 {{
   "title_line1": "...",
   "title_line2": "...",
+  "hook": "...",
   "box1": {{"label": "...", "points": ["...", "...", "..."]}},
   "box2": {{"label": "...", "points": ["...", "...", "..."]}},
   "box3": {{"label": "...", "points": ["...", "...", "..."]}},
@@ -47,6 +48,26 @@ Return ONLY valid JSON — no markdown, no explanation:
 """.strip()
 
 _SYSTEM = "You generate structured JSON content for visual infographics. Return only valid JSON, no extra text."
+
+
+def _clean_text(s: str) -> str:
+    """Strip stray markdown/comment markers the model sometimes leaks into 'plain text' fields."""
+    s = s.strip()
+    s = re.sub(r'^(#+|//+)\s*', '', s)
+    s = re.sub(r'\*{1,3}(.+?)\*{1,3}', r'\1', s)
+    s = re.sub(r'_{1,2}(.+?)_{1,2}', r'\1', s)
+    s = s.replace('`', '')
+    return s.strip()
+
+
+def _clean_content(data: dict) -> dict:
+    data["title_line1"] = _clean_text(data["title_line1"])
+    data["title_line2"] = _clean_text(data["title_line2"])
+    data["hook"] = _clean_text(data["hook"])
+    for key in ["box1", "box2", "box3", "box4", "box5"]:
+        data[key]["label"] = _clean_text(data[key]["label"])
+        data[key]["points"] = [_clean_text(p) for p in data[key]["points"]]
+    return data
 
 
 def generate_content(topic: str, research: str, generate_text_fn) -> dict:
@@ -61,10 +82,9 @@ def generate_content(topic: str, research: str, generate_text_fn) -> dict:
         raw = raw.strip()
         try:
             data = json.loads(raw)
-            required = ["title_line1", "title_line2", "box1", "box2", "box3", "box4", "box5"]
+            required = ["title_line1", "title_line2", "hook", "box1", "box2", "box3", "box4", "box5"]
             if all(k in data for k in required):
-                data["handle"] = INFOGRAPHIC_HANDLE
-                return data
+                return _clean_content(data)
         except (json.JSONDecodeError, KeyError):
             pass
 

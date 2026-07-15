@@ -52,8 +52,8 @@ def render(content: dict, out_path: str) -> str:
         with sync_playwright() as p:
             browser = p.chromium.launch()
             page = browser.new_page(
-                viewport={"width": 900, "height": 920},
-                device_scale_factor=2,   # 2× = crisp 1800×1840 output
+                viewport={"width": 1080, "height": 1350},
+                device_scale_factor=1,   # already LinkedIn's recommended 1080×1350 (4:5)
             )
             page.goto(f"file://{tmp_html}")
             page.wait_for_load_state("networkidle")   # waits for Google Fonts
@@ -77,15 +77,14 @@ if __name__ == "__main__":
         sample = json.loads(SAMPLE.read_text())
     else:
         sample = {
-            "title_line1": "Why AI Agents",
-            "title_line2": "Fail in Production",
-            "box1": {"label": "THE DEMO",    "points": ["static inputs",   "happy paths only", "controlled data"]},
-            "box2": {"label": "PRODUCTION",  "points": ["dynamic inputs",  "real edge cases",  "concurrent load"]},
-            "box3": {"label": "ROOT CAUSE",  "points": ["no validation",   "brittle logic",    "missing fallbacks"]},
-            "box4": {"label": "THE GAP",     "points": ["demo ≠ prod",     "false confidence"]},
-            "box5": {"label": "THE FIX",     "points": ["guardrails",      "observability",    "retry logic"]},
-            "quote": "Production success = boring engineering details",
-            "handle": "@VipinAIHub",
+            "title_line1": "Why Your Agent",
+            "title_line2": "Breaks In Prod",
+            "hook": "demos never see concurrent load or a missing fallback path.",
+            "box1": {"label": "THE DEMO",     "points": ["static input", "happy path", "controlled data"]},
+            "box2": {"label": "REAL TRAFFIC", "points": ["dynamic input", "edge cases", "concurrent load"]},
+            "box3": {"label": "ROOT CAUSE",   "points": ["no validation", "brittle logic", "no fallback"]},
+            "box4": {"label": "THE GAP",      "points": ["false confidence", "silent failure", "no guardrails"]},
+            "box5": {"label": "THE FIX",      "points": ["guardrails", "observability", "retry logic"]},
         }
     render(sample, out)
     print(f"Saved to {out}")
