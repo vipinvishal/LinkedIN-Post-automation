@@ -21,18 +21,25 @@ Write for someone scrolling fast on mobile: the headline must stop the scroll, a
 understandable in under 2 seconds.
 
 Topic: {topic}
-Research context: {research}
+
+The LinkedIn post this infographic will accompany (the infographic MUST illustrate the SAME narrative —
+same problem, same solution/technique, same specific claims. Do not introduce a different angle, a
+different solution, or new facts not present in this post):
+{post_text}
 
 STRICT RULES:
-- box1..box5 : five sequential steps that build a real mental model of the topic, step 1 is the
-  simplest entry point, step 5 is the payoff / end state. Each must teach something concrete.
+- box1..box5 : five sequential steps that walk through the SAME story as the post above (its problem →
+  its solution → its key points), step 1 is the simplest entry point, step 5 is the payoff / end state.
+  If the post lists specific features/bullets for its solution, box2-5 should reflect those specific
+  points rather than inventing new ones.
 - All box labels : 1–2 words, ALL CAPS (e.g. "RETRIEVAL", "LATENCY", "GPU MEMORY")
 - All box points : exactly 3 items, max 3 words each — short tag-like phrases, plain text (no markdown)
-- title_line1 : a short, punchy, curiosity-driving hook phrase (3-5 words), NOT the raw topic name.
-  Should read like a scroll-stopping headline, e.g. "WHY YOUR RAG" not "Retrieval Augmented Generation".
+- title_line1 : a short, punchy, curiosity-driving hook phrase (3-5 words) matching the post's hook,
+  NOT the raw topic name. Should read like a scroll-stopping headline, e.g. "WHY YOUR RAG" not
+  "Retrieval Augmented Generation".
 - title_line2 : the payoff / rest of the hook (3-5 words), ALL CAPS, completes the headline from line1.
-- hook : one short punchy sentence (max 14 words) — a surprising fact or the single most important
-  takeaway. Written like a terminal code comment. Plain text, not ALL CAPS.
+- hook : one short punchy sentence (max 14 words) — the same core takeaway as the post's closing thought.
+  Written like a terminal code comment. Plain text, not ALL CAPS.
 
 Return ONLY valid JSON — no markdown, no explanation:
 {{
@@ -70,9 +77,9 @@ def _clean_content(data: dict) -> dict:
     return data
 
 
-def generate_content(topic: str, research: str, generate_text_fn) -> dict:
-    """Call the LLM to produce the 5-node infographic content dict."""
-    prompt = _CONTENT_PROMPT.format(topic=topic, research=research[:1200])
+def generate_content(topic: str, post_text: str, generate_text_fn) -> dict:
+    """Call the LLM to produce the 5-node infographic content dict, grounded in the actual post text."""
+    prompt = _CONTENT_PROMPT.format(topic=topic, post_text=post_text[:2500])
 
     for attempt in range(2):
         raw = generate_text_fn(prompt, _SYSTEM)

@@ -83,6 +83,11 @@ make people stop scrolling in the first 2 lines, encourage comments and shares, 
 technical depth — not hype.
 Target audience: AI/ML engineers, developers, tech professionals, and AI beginners who want to genuinely
 learn how the technology works.
+VOICE — read this carefully: you are a hands-on ENGINEER, not a senior architect or expert lecturing from
+a whiteboard. Never explain a mechanism the way a textbook or a senior architect briefing junior engineers
+would ("Think about it:", "Here's how it works:", confident declarative statements about what "the model
+does"). Instead, ground everything in specific things YOU did — I ran, I tested, I read, I debugged, I
+noticed, I got confused by, I re-checked. If you wouldn't say a line out loud to a peer over coffee, cut it.
 STRICTLY OUT OF SCOPE: business news, funding rounds, valuations, stock moves, market share, company
 rivalry/drama, layoffs, IPOs, career/business-advice angles, or anything implying the writer leads a team,
 runs a company, or manages an org's AI strategy. This is one engineer's personal learning journey — never
@@ -90,7 +95,7 @@ a company update, product announcement, or leadership narrative. If a topic drif
 leadership framing, redirect it to the underlying technology instead.
 """.strip()
 
-VIRAL_POST_PROMPT = """
+STYLE_1_PROMPT = """
 ━━━ INPUT ━━━
 Persona      : {persona}
 Content slot : {slot_label}
@@ -100,127 +105,40 @@ Tone         : {tone}
 Research from the web (ground your post in this real, current data):
 {research}
 
-━━━ WRITING RULES ━━━
-1. Start with a powerful hook in the first 1–2 lines.
-2. The hook must create curiosity, controversy, surprise, or urgency — make people stop scrolling.
-3. Use short lines (mobile-friendly). No long paragraphs.
-4. Write like a human creator, not corporate marketing.
-5. Mix education + storytelling + opinion.
-6. Include practical insights people can learn immediately.
-7. Add emotional triggers: curiosity, surprise, relatability, "wait, I didn't know that."
-8. Voice: first-person singular ONLY — "I", "I read", "I tried", "I broke", "I learned", "I finally understood".
-   This is one engineer's personal learning journey. NEVER use the word "we" at all — not "we shipped", not
-   "we're seeing", not even industry-wide "we're pushing context windows further". Rewrite every such line
-   in terms of what YOU personally read, tried, or noticed. Also never "my team", "our", "at my company", or
-   any language implying you lead a team, run a company, or ship products for an org.
-9. Go deep on ONE technical concept — explain it the way you'd explain it to a sharp engineer encountering
-   this specific idea for the first time. Depth and precision over breadth.
-10. End with a CTA that drives comments (a sharp question the audience genuinely wants to answer).
-11. Right after the CTA question, add ONE short standalone line pointing to your portfolio — describe it
-    accurately as a portfolio of your work/projects, e.g. "See what I've been building → link in the
-    comments." Vary the phrasing naturally each time, but always frame it as a portfolio showcasing work —
-    NEVER call it a blog, notes, journal, or "daily updates/deep dives" (it's a static portfolio, not a
-    stream of posts). Never spell out the actual URL or domain name in the post text — just say it's in
-    the comments.
-12. Add 4–6 relevant hashtags at the end.
-
-━━━ POST STRUCTURE ━━━
-1. Hook (1–2 lines — stop the scroll)
-2. Problem / surprising fact
-3. Main insight (3–7 short punchy points or a tight story)
-4. Personal opinion or takeaway
-5. CTA (comment-driving question)
-6. Portfolio mention (one short line, no raw URL — "link in the comments" style)
-7. Hashtags
-
-━━━ CONTENT RULES ━━━
-✓ Max 3000 characters TOTAL (including hashtags)
-✓ Short lines — single sentences or 2-line max per paragraph
-✓ Specific technical terms where relevant (LLM, RAG, fine-tuning, inference, vector DB, etc.)
-✓ Every claim must be specific — no vague generalities
-✗ NO hype language ("game-changing", "revolutionary", "the future is here")
-✗ NO generic emojis like 🚀🔥💡 — use sparingly and only if they add meaning
-✗ NO bold/italic markdown — plain text only (LinkedIn renders asterisks as literals)
-✗ NEVER present 3 competing ideas — pick ONE insight and go deep
-✗ NEVER write from an analyst perspective — always from someone personally studying/experimenting with it
-✗ NO business/funding/company content — no valuations, funding rounds, stock moves, market share,
-  layoffs, IPOs, or "who is winning" company rivalry framing. Stay on the technology itself.
-✗ NEVER use "we", "my team", "our roadmap", "at my company", or anything implying you lead a team, manage
-  people, or represent an organization's AI strategy. You are one engineer, learning on your own.
-✗ NEVER write out the actual portfolio URL or domain name in the post — outbound links in the post body
-  suppress LinkedIn's reach. Only reference it indirectly ("link in the comments").
-✓ Always teach something concrete about how the technology actually works (architecture, infra,
-  systems, algorithms) — the reader should walk away understanding the tech better, not just the news.
-
-━━━ OUTPUT ━━━
-Return ONLY valid JSON — no prose, no markdown fences, no explanation before or after:
-{{
-  "post_text": "the full LinkedIn post including hashtags",
-  "hook_score": <1-10 how likely this hook stops the scroll>,
-  "viral_score": <1-10 overall viral potential>,
-  "image_recommended": <true or false>,
-  "image_type": "<infographic|meme|carousel|chart|none>",
-  "image_prompt": "<detailed prompt for generating the image, or empty string if none>"
-}}
-""".strip()
-
-LISTICLE_POST_PROMPT = """
-━━━ INPUT ━━━
-Persona      : {persona}
-Content slot : {slot_label}
-Topic        : {topic}
-Tone         : {tone}
-
-Research from the web (ground your post in this real, current data):
-{research}
-
-━━━ FORMAT: STRUCTURED LISTICLE BREAKDOWN ━━━
-This post breaks ONE topic into a clear enumerated list (types, steps, patterns, or common mistakes) —
-the goal is a highly skimmable, saveable, screenshot-worthy reference post, not a personal story.
+━━━ FORMAT: PROBLEM → SOLUTION ━━━
+Follow this exact structure:
+1. Start with the problem statement — a concrete, specific pain point tied to this topic. Make it
+   visceral, something the reader has actually run into.
+2. Emphasize the problem — go one level deeper on why it's worse than it looks, or what it costs people
+   who ignore it (wasted time, broken systems, wasted compute, bad user experience — be specific).
+3. Talk about the potential solution space in general terms before naming anything specific — build a
+   little anticipation.
+4. Introduce the specific technical solution as the answer — name the actual technique, architecture,
+   tool, or concept from the research/topic that solves the problem. It must be something that genuinely
+   fits this AI/tech topic (e.g. a real method, framework, or architectural pattern) — never a generic or
+   unrelated product name.
+5. Highlight 3-4 concrete features/capabilities of that solution that prove it actually solves the
+   problem from steps 1-2. Be specific and technical, not vague marketing language.
+6. Leave readers with a closing thought — one sharp, memorable line that reframes how they should think
+   about this problem going forward.
+7. Encourage readers to follow your profile for more content like this — one short, natural line (not
+   salesy). Then on its own line, add a short portfolio mention — describe it accurately as a portfolio
+   of your work/projects, e.g. "See what I've been building → link in the comments." Never spell out the
+   actual URL or domain name in the post text itself.
 
 ━━━ WRITING RULES ━━━
-1. Open with a contrarian misconception hook, exactly this shape:
-   "Most people think [common assumption]. But [the actual, more precise truth]." A first-person variant
-   like "I used to think..." also works — either way it must sound like something a real person concluded,
-   not a textbook.
-2. One short setup line introducing the list: "Here are the N [types/steps/patterns] of [topic]:"
-3. Enumerate 4-6 items. Each item:
-   - one relevant emoji + a short label (2-4 words)
-   - 2-3 short arrow bullets ("→ ...") explaining it — fragments, not full sentences, max ~12 words each
-4. Close with a misconception-correction pair:
-   "✕ [the wrong/oversimplified framing]"
-   "✓ [the correct, more precise framing]"
-5. One short first-person takeaway line tying it back to why it matters practically.
-6. End with ONE short comment-driving question (specific, answerable, inviting people to share their
-   own experience or opinion on the list above).
-7. Right after that, add ONE short standalone line pointing to your portfolio — describe it accurately
-   as a portfolio of your work/projects, e.g. "See what I've been building → link in the comments."
-   Never spell out the actual URL or domain name in the post text — just say it's in the comments.
-8. Do NOT add hashtags to this format.
-
-━━━ POST STRUCTURE ━━━
-1. Contrarian hook (1-2 lines)
-2. Setup line ("Here are the N types of X:")
-3. N enumerated items (emoji + label + arrow bullets)
-4. Misconception correction (✕ / ✓)
-5. One-line takeaway
-6. CTA (comment-driving question)
-7. Portfolio mention (one short line, no raw URL)
-
-━━━ CONTENT RULES ━━━
-✓ Max 3000 characters TOTAL
-✓ Every bullet must be specific and technically accurate — no vague filler
-✓ Emojis are allowed ONLY as the one-per-item category marker and the ✕/✓ correction pair — nothing else
-✗ NO hype language ("game-changing", "revolutionary", "the future is here")
-✗ NO bold/italic markdown — plain text only (LinkedIn renders asterisks as literals)
-✗ NO business/funding/company content — no valuations, funding rounds, stock moves, market share,
-  layoffs, IPOs, or "who is winning" company rivalry framing. Stay on the technology itself.
-✗ NEVER use "we", "my team", "our roadmap", "at my company", or anything implying you lead a team, manage
-  people, or represent an organization's AI strategy. You are one engineer, learning on your own.
-✗ NEVER write out the actual portfolio URL or domain name in the post — outbound links in the post body
-  suppress LinkedIn's reach. Only reference it indirectly ("link in the comments").
-✓ Pick a topic that genuinely enumerates well (types, steps, patterns, common mistakes) — if the given
-  topic doesn't naturally break into a list, find the closest enumerable angle within it.
+- Voice: first-person, one individual ENGINEER sharing what they ran into and figured out — NEVER "we",
+  "my team", "our roadmap", "at my company", or anything implying you lead a team or company. You are also
+  NOT a senior architect lecturing junior engineers — avoid "Think about it:", "Here's how it works:", or
+  confidently declaring what "the model does" like a textbook. Ground the explanation in what YOU actually
+  did (I ran, I tested, I debugged, I noticed) rather than presenting mechanisms from a position of authority.
+- No hype language ("game-changing", "revolutionary", "the future is here").
+- No bold/italic markdown, and never use "*" as a bullet marker anywhere — LinkedIn renders asterisks
+  as literal characters, not formatting. Use "→" or a plain "-" for any bullet/list line instead.
+- Short, mobile-friendly lines — no long paragraphs.
+- No business/funding/company content — stay on the technology itself.
+- No hashtags.
+- Max 3000 characters TOTAL.
 
 ━━━ OUTPUT ━━━
 Return ONLY valid JSON — no prose, no markdown fences, no explanation before or after:
@@ -234,8 +152,68 @@ Return ONLY valid JSON — no prose, no markdown fences, no explanation before o
 }}
 """.strip()
 
-# Slots where the topic naturally enumerates into types/steps/patterns — eligible for the listicle format
-_LISTICLE_ELIGIBLE_SLOTS = {"educational", "advanced"}
+STYLE_2_PROMPT = """
+━━━ INPUT ━━━
+Persona      : {persona}
+Content slot : {slot_label}
+Topic        : {topic}
+Tone         : {tone}
+
+Research from the web (ground your post in this real, current data):
+{research}
+
+━━━ FORMAT: SCENARIO → RISK → SOLUTION ━━━
+Follow this exact structure:
+1. Start with an imaginary scenario — a short, vivid "Imagine..." or "Picture this..." moment that puts
+   the reader inside a real situation tied to this topic (a 2am pager alert, a demo breaking in front of
+   a customer, a model silently failing in production — whatever genuinely fits the topic).
+2. Highlight how critical this is for organizations and enterprises at scale — why this isn't just a
+   toy-project problem, but something that matters the moment real users or real systems are involved.
+3. Talk about a potential security, reliability, or failure risk connected to this scenario — be specific
+   about what actually goes wrong technically.
+4. Introduce the solution — name the actual technique, architecture, tool, or concept from the
+   research/topic that addresses this risk. It must genuinely fit this AI/tech topic — never a generic
+   or unrelated product name.
+5. Cover the solution in exactly 5 short bullet points — specific, technical, no filler. Prefix each
+   bullet with "→ " (an arrow, not an asterisk or dash) — LinkedIn renders plain text only, and a literal
+   "*" shows up as a stray character instead of a bullet.
+6. End with one line on how game-changing this capability is — grounded and specific, not hype for
+   hype's sake.
+7. Conclude with a line that invites the audience into the comments — a sharp, specific question. Then
+   on its own line, add a short portfolio mention — describe it accurately as a portfolio of your
+   work/projects, e.g. "See what I've been building → link in the comments." Never spell out the actual
+   URL or domain name in the post text itself.
+
+━━━ WRITING RULES ━━━
+- Voice: first-person, one individual ENGINEER, not a senior architect or expert lecturing from authority
+  — NEVER "we", "my team", "our roadmap", "at my company", or anything implying you lead a team or
+  company. Outside the scenario itself, ground the risk/solution explanation in what YOU noticed or
+  looked into, not confident textbook-style declarations. The imaginary scenario can be told in second
+  person ("Imagine you...") or about a hypothetical team — that's a narrative device, not a claim about
+  your own company.
+- No hype language beyond the one closing "game-changing" style line.
+- No bold/italic markdown, and never use "*" as a bullet marker anywhere — LinkedIn renders asterisks
+  as literal characters, not formatting. Use "→" or a plain "-" for any bullet/list line instead.
+- Short, mobile-friendly lines — no long paragraphs.
+- No business/funding/company content — stay on the technology itself.
+- No hashtags.
+- Max 3000 characters TOTAL.
+
+━━━ OUTPUT ━━━
+Return ONLY valid JSON — no prose, no markdown fences, no explanation before or after:
+{{
+  "post_text": "the full LinkedIn post (no hashtags)",
+  "hook_score": <1-10 how likely this hook stops the scroll>,
+  "viral_score": <1-10 overall viral potential>,
+  "image_recommended": <true or false>,
+  "image_type": "<infographic|meme|carousel|chart|none>",
+  "image_prompt": "<detailed prompt for generating the image, or empty string if none>"
+}}
+""".strip()
+
+# Deterministic alternation (not random) so both styles get an even, predictable rotation to compare —
+# day-of-year + fixed slot position means every slot cycles through both styles day to day.
+_SLOT_ORDER = ["news", "educational", "personal", "advanced"]
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -418,10 +396,12 @@ def generate_post(topic: str, tone: str, niche: str, persona: str, research: str
     import re as _re
     import json as _json
 
-    use_listicle = CONTENT_SLOT in _LISTICLE_ELIGIBLE_SLOTS and random.random() < 0.5
-    template = LISTICLE_POST_PROMPT if use_listicle else VIRAL_POST_PROMPT
+    slot_index = _SLOT_ORDER.index(CONTENT_SLOT) if CONTENT_SLOT in _SLOT_ORDER else 0
+    day_of_year = datetime.now(timezone.utc).timetuple().tm_yday
+    use_style_2 = (day_of_year + slot_index) % 2 == 1
+    template = STYLE_2_PROMPT if use_style_2 else STYLE_1_PROMPT
 
-    print(f"[ Step 2 ] Generating post with Gemini... (format: {'listicle' if use_listicle else 'narrative'})")
+    print(f"[ Step 2 ] Generating post with Gemini... (style: {'2 (scenario/risk/solution)' if use_style_2 else '1 (problem/solution)'})")
 
     prompt = template.format(
         persona=persona,
@@ -465,6 +445,7 @@ def generate_post(topic: str, tone: str, niche: str, persona: str, research: str
     # Strip any stray markdown formatting
     post = _re.sub(r'\*{1,3}(.+?)\*{1,3}', r'\1', post)
     post = _re.sub(r'_{1,2}(.+?)_{1,2}', r'\1', post)
+    post = _re.sub(r'^\s*\*\s+', '→ ', post, flags=_re.MULTILINE)  # stray "* " bullet → arrow
     post = post.strip()
 
     limit = PLATFORM_CHAR_LIMITS[PLATFORM]
@@ -512,8 +493,9 @@ INCLUDE_INFOGRAPHIC = os.environ.get("INCLUDE_INFOGRAPHIC", "1") == "1"
 _PNG_PATH = os.path.join(_script_dir, "..", "renderer", "output", "infographic.png")
 
 
-def build_infographic(topic: str, research: str) -> str | None:
-    """Generate infographic content + render PNG. Returns local PNG path, or None on failure."""
+def build_infographic(topic: str, post_text: str) -> str | None:
+    """Generate infographic content (grounded in the actual post text) + render PNG.
+    Returns local PNG path, or None on failure."""
     if not INCLUDE_INFOGRAPHIC:
         return None
 
@@ -527,9 +509,9 @@ def build_infographic(topic: str, research: str) -> str | None:
         print("  [infographic] skipped — scripts.infographic not importable.")
         return None
 
-    print("[ Step 2.5 ] Generating infographic...")
+    print("[ Step 2.5 ] Generating infographic (synced to the generated post)...")
     try:
-        content = ig.generate_content(topic, research, generate_text)
+        content = ig.generate_content(topic, post_text, generate_text)
         png     = ig.render_infographic(content, _PNG_PATH)
         print(f"  Infographic rendered: {png}\n")
         return png
@@ -688,7 +670,7 @@ def main(preview: bool = False):
     try:
         research = research_topic(topic, NICHE)
         post     = generate_post(topic, tone, NICHE, PERSONA, research)
-        png_path = build_infographic(topic, research)
+        png_path = build_infographic(topic, post)
 
         if preview:
             if PORTFOLIO_URL:

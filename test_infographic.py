@@ -16,7 +16,7 @@ load_dotenv()
 
 TOPIC = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "How to build AI agents that actually work in production"
 
-SAMPLE_RESEARCH = (
+SAMPLE_POST_TEXT = (
     "AI agents fail in production due to poor memory management, brittle tool calling, "
     "lack of error handling, and no observability. Key fixes: structured outputs, "
     "guardrails, retry logic, logging every LLM call, and testing edge cases early."
@@ -32,7 +32,7 @@ def main():
     print(f"\nTopic : {TOPIC}")
     print("Generating infographic content via Gemini...\n")
 
-    content = ig.generate_content(TOPIC, SAMPLE_RESEARCH, generate_text)
+    content = ig.generate_content(TOPIC, SAMPLE_POST_TEXT, generate_text)
 
     print(f"  title : {content['title_line1']} / {content['title_line2']}")
     for k in ["box1", "box2", "box3", "box4", "box5"]:
