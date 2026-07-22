@@ -491,11 +491,13 @@ def generate_post(topic: str, tone: str, niche: str, persona: str, research: str
 
 INCLUDE_INFOGRAPHIC = os.environ.get("INCLUDE_INFOGRAPHIC", "1") == "1"
 _PNG_PATH = os.path.join(_script_dir, "..", "renderer", "output", "infographic.png")
+PROCESS_ELIGIBLE_TOPICS = set(_config.get("process_eligible_topics", []))
 
 
 def build_infographic(topic: str, post_text: str) -> str | None:
     """Generate infographic content (grounded in the actual post text) + render PNG.
-    Returns local PNG path, or None on failure."""
+    Picks the light-theme 'how it works' process template for mechanism-shaped topics,
+    the default dark 5-step card for everything else. Returns local PNG path, or None on failure."""
     if not INCLUDE_INFOGRAPHIC:
         return None
 
@@ -509,10 +511,16 @@ def build_infographic(topic: str, post_text: str) -> str | None:
         print("  [infographic] skipped — scripts.infographic not importable.")
         return None
 
-    print("[ Step 2.5 ] Generating infographic (synced to the generated post)...")
+    use_process = topic in PROCESS_ELIGIBLE_TOPICS
+    print(f"[ Step 2.5 ] Generating infographic (synced to post, template: "
+          f"{'process/how-it-works' if use_process else 'dark 5-step'})...")
     try:
-        content = ig.generate_content(topic, post_text, generate_text)
-        png     = ig.render_infographic(content, _PNG_PATH)
+        if use_process:
+            content = ig.generate_process_content(topic, post_text, generate_text)
+            png     = ig.render_infographic(content, _PNG_PATH, template="process_infographic.html.j2")
+        else:
+            content = ig.generate_content(topic, post_text, generate_text)
+            png     = ig.render_infographic(content, _PNG_PATH)
         print(f"  Infographic rendered: {png}\n")
         return png
     except Exception as exc:

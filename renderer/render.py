@@ -21,10 +21,17 @@ TEMPLATE  = "infographic.html.j2"
 SAMPLE    = ROOT / "data" / "sample_content.json"
 OUTPUT    = ROOT / "output" / "infographic.png"
 
+# Each template declares its own canvas size; default matches LinkedIn's
+# recommended 1080x1350 (4:5). The process template is taller (more sections).
+_CANVAS_SIZES = {
+    "infographic.html.j2":         (1080, 1350),
+    "process_infographic.html.j2": (1080, 1330),
+}
 
-def _build_html(content: dict) -> str:
+
+def _build_html(content: dict, template: str = TEMPLATE) -> str:
     env  = Environment(loader=FileSystemLoader(str(ROOT / "templates")))
-    tmpl = env.get_template(TEMPLATE)
+    tmpl = env.get_template(template)
     return tmpl.render(**content)
 
 
@@ -33,11 +40,12 @@ def _draw(page) -> None:
     page.evaluate("window.drawInfographic && window.drawInfographic()")
 
 
-def render(content: dict, out_path: str) -> str:
-    """Render content dict → PNG. Returns out_path string."""
+def render(content: dict, out_path: str, template: str = TEMPLATE) -> str:
+    """Render content dict → PNG using the given template. Returns out_path string."""
     from playwright.sync_api import sync_playwright
 
-    html = _build_html(content)
+    html = _build_html(content, template)
+    width, height = _CANVAS_SIZES.get(template, (1080, 1350))
 
     # Write HTML to temp file so file:// URL works for relative asset loading
     with tempfile.NamedTemporaryFile(
@@ -52,8 +60,8 @@ def render(content: dict, out_path: str) -> str:
         with sync_playwright() as p:
             browser = p.chromium.launch()
             page = browser.new_page(
-                viewport={"width": 1080, "height": 1350},
-                device_scale_factor=1,   # already LinkedIn's recommended 1080×1350 (4:5)
+                viewport={"width": width, "height": height},
+                device_scale_factor=1,
             )
             page.goto(f"file://{tmp_html}")
             page.wait_for_load_state("networkidle")   # waits for Google Fonts

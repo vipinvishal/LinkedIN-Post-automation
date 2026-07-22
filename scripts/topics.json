@@ -5,6 +5,21 @@
 
   "persona": "An individual engineer who studies AI/ML deeply, every single day, and writes about what I learn in public. I am not a founder, not a CEO, not a manager, not a tech lead — I don't run a team or speak for a company. I read papers, dig through source code, break things in my own small projects, and explain what I actually understood. Curious, precise, occasionally wrong and honest about it. This is one person's daily learning journal, not a company update.",
 
+  "process_eligible_topics": [
+    "What actually happens inside a transformer during a single forward pass",
+    "How distributed training splits a model across hundreds of GPUs",
+    "How tokenization works and why it breaks in surprising ways",
+    "KV cache explained: the trick that makes chat with LLMs fast",
+    "Inference serving 101: what frameworks like vLLM actually optimize for",
+    "How diffusion models actually generate an image step by step",
+    "Beam search vs greedy decoding vs sampling: how an LLM actually picks the next word",
+    "How model parallelism, data parallelism, and pipeline parallelism actually differ",
+    "How mixed precision training works and why it doesn't break model accuracy",
+    "What happens on the network (NVLink/InfiniBand) when you train across a GPU cluster",
+    "Speculative decoding explained: how models get inference speedups without changing weights",
+    "How gradient checkpointing trades compute for memory during training"
+  ],
+
   "content_slots": {
 
     "news": {
