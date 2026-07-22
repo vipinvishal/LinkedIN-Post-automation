@@ -662,7 +662,8 @@ def post_portfolio_comment(post_id: str) -> None:
 # ══════════════════════════════════════════════════════════════════════════════
 
 def main(preview: bool = False):
-    topic = random.choice(TOPICS)
+    topic_override = os.environ.get("TOPIC_OVERRIDE", "").strip()
+    topic = topic_override if topic_override else random.choice(TOPICS)
     tone  = random.choice(TONES)
 
     print(f"\n{'='*60}")
@@ -671,7 +672,7 @@ def main(preview: bool = False):
         print(f"  MODE: PREVIEW (no LinkedIn posting)")
     print(f"{'='*60}")
     print(f"  Slot  : [{CONTENT_SLOT.upper()}] {SLOT_LABEL}")
-    print(f"  Topic : {topic}")
+    print(f"  Topic : {topic}" + (" (forced via TOPIC_OVERRIDE)" if topic_override else ""))
     print(f"  Tone  : {tone}")
     print(f"{'='*60}\n")
 

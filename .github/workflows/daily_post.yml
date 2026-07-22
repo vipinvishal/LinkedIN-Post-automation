@@ -12,6 +12,15 @@ on:
         description: 'Content slot: news | educational | personal | advanced'
         required: false
         default: 'news'
+      topic:
+        description: 'Force an exact topic string (must match one in topics.json) — leave blank for random'
+        required: false
+        default: ''
+      preview:
+        description: 'Preview only — do not publish to LinkedIn'
+        required: false
+        type: boolean
+        default: false
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -54,7 +63,7 @@ jobs:
           fi
 
       - name: Generate and post to LinkedIn
-        run: python scripts/generate_and_schedule.py
+        run: python scripts/generate_and_schedule.py ${{ github.event.inputs.preview == 'true' && '--preview' || '' }}
         env:
           GEMINI_API_KEY:         ${{ secrets.GEMINI_API_KEY }}
           GEMINI_API_KEY_2:       ${{ secrets.GEMINI_API_KEY_2 }}
@@ -64,3 +73,13 @@ jobs:
           LINKEDIN_PERSON_ID:     ${{ secrets.LINKEDIN_PERSON_ID }}
           CONTENT_SLOT:           ${{ steps.slot.outputs.slot }}
           INCLUDE_INFOGRAPHIC:    "1"
+          TOPIC_OVERRIDE:         ${{ github.event.inputs.topic }}
+
+      - name: Upload generated infographic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: infographic-${{ github.run_id }}
+          path: renderer/output/*.png
+          if-no-files-found: ignore
+          retention-days: 14
