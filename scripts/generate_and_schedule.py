@@ -35,8 +35,8 @@ EXA_API_KEY           = os.environ.get("EXA_API_KEY")
 LINKEDIN_ACCESS_TOKEN = os.environ.get("LINKEDIN_ACCESS_TOKEN")
 LINKEDIN_PERSON_ID    = os.environ.get("LINKEDIN_PERSON_ID")
 
-GEMINI_MODEL           = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
-GEMINI_FALLBACK_MODELS = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-3.6-flash"]
+GEMINI_MODEL           = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_FALLBACK_MODELS = ["gemini-2.5-flash", "gemini-3.6-flash", "gemini-flash-latest"]
 MAX_RETRIES            = 4
 GEMINI_MAX_ATTEMPTS    = 2    # per model; move on to the next model quickly when overloaded
 GEMINI_TIMEOUT_MS      = 60000

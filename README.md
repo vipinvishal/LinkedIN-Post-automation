@@ -94,7 +94,7 @@ Add these to your `.env` file:
 | `EXA_API_KEY` | [exa.ai](https://exa.ai) | Yes |
 | `LINKEDIN_ACCESS_TOKEN` | Run `python scripts/get_linkedin_token.py` | Yes |
 | `LINKEDIN_PERSON_ID` | Run `python scripts/get_linkedin_token.py` | Yes |
-| `GEMINI_MODEL` | Overrides the default model (`gemini-flash-latest`) | Optional |
+| `GEMINI_MODEL` | Overrides the default model (`gemini-2.5-flash`) | Optional |
 | `INCLUDE_INFOGRAPHIC` | Set to `0` to skip infographic generation entirely | Optional (default `1`) |
 | `INFOGRAPHIC_THEME` | `dark` (default) or `light` | Optional |
 
