@@ -49,7 +49,7 @@ PLATFORM_CHAR_LIMITS = {
     "x":        280,
 }
 PLATFORM = "linkedin"  # this pipeline posts to LinkedIn only
-TARGET_POST_LENGTH = 1300  # soft target for a short, scannable post — well under the 3000 hard cap
+TARGET_POST_LENGTH = 1000  # soft target: short enough to read in ~20 seconds — well under the 3000 hard cap
 
 # ── Content slot (set by workflow; defaults to 'news') ────────────────────────
 CONTENT_SLOT = os.environ.get("CONTENT_SLOT", "news")
@@ -89,8 +89,18 @@ learn how the technology works.
 VOICE — read this carefully: you are a hands-on ENGINEER, not a senior architect or expert lecturing from
 a whiteboard. Never explain a mechanism the way a textbook or a senior architect briefing junior engineers
 would ("Think about it:", "Here's how it works:", confident declarative statements about what "the model
-does"). Instead, ground everything in specific things YOU did — I ran, I tested, I read, I debugged, I
-noticed, I got confused by, I re-checked. If you wouldn't say a line out loud to a peer over coffee, cut it.
+does"). Instead, ground everything in things you genuinely READ and NOTICED — "I read", "I looked into",
+"what surprised me", "I got confused by", "I re-checked the numbers". NEVER invent hands-on work: do not
+claim you ran, built, benchmarked, debugged or "spent the weekend" on something unless the research
+below literally says so. If you wouldn't say a line out loud to a smart friend over coffee, cut it.
+
+WRITING LEVEL — non-negotiable: write like a clear-thinking person talking to a smart friend who is NOT
+an expert. Plain everyday words. Short sentences (aim for 12 words or fewer; never over 20). One idea per
+sentence. If a term would make a beginner stop (p99, prefill, MoE, KV cache, quantization), either swap
+it for plain words or explain it in a few words right there ("prefill — the model reading your prompt").
+Prefer a real number or a concrete example over an abstract claim. Every post must TEACH one useful thing:
+after reading, someone should be able to explain it to a friend or use it the same day. Teach it; don't
+just announce it. No filler, no padding, no corporate or "LinkedIn-influencer" voice.
 STRICTLY OUT OF SCOPE: business news, funding rounds, valuations, stock moves, market share, company
 rivalry/drama, layoffs, IPOs, career/business-advice angles, or anything implying the writer leads a team,
 runs a company, or manages an org's AI strategy. This is one engineer's personal learning journey — never
@@ -131,7 +141,8 @@ Follow this exact structure. Each numbered part is 1-2 short sentences MAX, not 
   "my team", "our roadmap", "at my company", or anything implying you lead a team or company. You are also
   NOT a senior architect lecturing junior engineers — avoid "Think about it:", "Here's how it works:", or
   confidently declaring what "the model does" like a textbook. Ground the explanation in what YOU actually
-  did (I ran, I tested, I debugged, I noticed) rather than presenting mechanisms from a position of authority.
+  read and noticed (I read, I looked into, what surprised me) rather than presenting mechanisms from a
+  position of authority. Never invent hands-on work you did not do.
 - No hype language ("game-changing", "revolutionary", "the future is here").
 - No bold/italic markdown, and never use "*" as a bullet marker anywhere — LinkedIn renders asterisks
   as literal characters, not formatting. Use "→" or a plain "-" for any bullet/list line instead.
@@ -139,9 +150,21 @@ Follow this exact structure. Each numbered part is 1-2 short sentences MAX, not 
   restating the same point twice in different words.
 - No business/funding/company content — stay on the technology itself.
 - No hashtags.
-- TARGET LENGTH: 900-1300 characters total. This is a post someone reads end-to-end in one glance while
-  scrolling, not an essay — every sentence must earn its place. 3000 characters is the hard ceiling, not
-  the goal.
+- TARGET LENGTH: 750-1000 characters total (roughly 120-170 words). Someone should finish it in about
+  20 seconds without getting bored — cut anything that isn't the hook, the one idea, the proof, or the
+  question. 3000 characters is the hard ceiling, not the goal.
+- MUST TEACH: include ONE concrete example, real number, or everyday analogy that makes the idea click
+  (e.g. "like a library with 1,000 books but you only open 20"). If you name a technique or term, say what
+  it does and why it matters in plain words in the same breath — never drop a name and move on. The reader
+  should leave knowing one new thing they can repeat to someone else.
+- ALWAYS END WITH THE QUESTION. The last line is the closing question, no exceptions.
+- SIMPLE WORDS, SHORT LINES: sentences of 12 words or fewer, one idea each. Each bullet 12 words or fewer.
+  Explain any jargon in a few plain words or replace it. No sentence should need a second read.
+- HOOK RULES: line 1 must stand alone, be 12 words or fewer (about 80 characters), and contain a specific
+  number, a surprising fact, or a concrete moment — never a vague claim. A stranger who knows nothing about
+  this topic should still want to read line 2.
+- CLOSING QUESTION: make it dead easy to answer in one line — name two or three concrete options to pick
+  from, or ask for a specific number or tool they use. Easy replies are what produce comments.
 - NEVER open with a question (measurably the single worst opener). NEVER open with "Here's what/how/why"
   or a "Stop X, start Y" line. NEVER bridge a reveal with "The result?" or "Plot twist:" — just state it.
   NEVER announce candor ("Let me be honest", "Confession:", "unpopular opinion") without a specific,
@@ -214,9 +237,21 @@ Follow this exact structure. Each numbered part is 1-2 short sentences MAX excep
   restating the same point twice in different words.
 - No business/funding/company content — stay on the technology itself.
 - No hashtags.
-- TARGET LENGTH: 900-1300 characters total. This is a post someone reads end-to-end in one glance while
-  scrolling, not an essay — every sentence must earn its place. 3000 characters is the hard ceiling, not
-  the goal.
+- TARGET LENGTH: 750-1000 characters total (roughly 120-170 words). Someone should finish it in about
+  20 seconds without getting bored — cut anything that isn't the hook, the one idea, the proof, or the
+  question. 3000 characters is the hard ceiling, not the goal.
+- MUST TEACH: include ONE concrete example, real number, or everyday analogy that makes the idea click
+  (e.g. "like a library with 1,000 books but you only open 20"). If you name a technique or term, say what
+  it does and why it matters in plain words in the same breath — never drop a name and move on. The reader
+  should leave knowing one new thing they can repeat to someone else.
+- ALWAYS END WITH THE QUESTION. The last line is the closing question, no exceptions.
+- SIMPLE WORDS, SHORT LINES: sentences of 12 words or fewer, one idea each. Each bullet 12 words or fewer.
+  Explain any jargon in a few plain words or replace it. No sentence should need a second read.
+- HOOK RULES: line 1 must stand alone, be 12 words or fewer (about 80 characters), and contain a specific
+  number, a surprising fact, or a concrete moment — never a vague claim. A stranger who knows nothing about
+  this topic should still want to read line 2.
+- CLOSING QUESTION: make it dead easy to answer in one line — name two or three concrete options to pick
+  from, or ask for a specific number or tool they use. Easy replies are what produce comments.
 - NEVER open with a question (measurably the single worst opener). NEVER open with "Here's what/how/why"
   or a "Stop X, start Y" line. NEVER bridge a reveal with "The result?" or "Plot twist:" — just state it.
   NEVER announce candor ("Let me be honest", "Confession:", "unpopular opinion") without a specific,
@@ -660,6 +695,23 @@ pattern once it's mechanical. Only fix a paragraph that reads genuinely machine-
 sentences all nearly the same length, no subordinate clause anywhere). If the input already reads like
 a person — one long sentence next to a short one here and there — leave its rhythm alone entirely.
 
+### KEEP IT SIMPLE AND SHORT (this matters as much as sounding human)
+
+The reader is a smart person who is NOT an expert. Write at an easy, everyday reading level.
+
+* Swap hard or technical-sounding words for plain ones. If a jargon term is needed, explain it in a few
+  plain words the first time it appears.
+* Break any sentence longer than about 15 words into two. One idea per sentence.
+* Keep every list line to about 12 words. Cut the weakest line if the post runs long.
+* Line 1 (the hook) must stay short — about 12 words or fewer — and keep its specific number or surprise.
+  Never lengthen the hook. If it is long, tighten it.
+* Remove invented first-hand experience. If the post claims the writer ran, built, benchmarked, tested,
+  debugged or "spent the weekend on" something, rewrite it as reading or noticing ("I read", "I looked
+  into", "what stood out to me"). Never add new personal claims.
+* The last line must be one easy-to-answer question that names concrete options. Keep it short. If the input has no closing question, add one.
+* Keep any concrete example, number or analogy — those are what make the post worth reading.
+* Never make the post longer than the input. Aim for 750-1000 characters.
+
 ### PRESERVE THE ORIGINAL THINKING
 
 Do NOT:
@@ -744,6 +796,20 @@ def humanize_post(post_text: str) -> str:
     rewritten = rewritten.strip()
 
     limit = PLATFORM_CHAR_LIMITS[PLATFORM]
+
+    # Keep the humanized version short: one soft trim pass if it drifted well past the target.
+    if len(rewritten) > TARGET_POST_LENGTH + 150:
+        print(f"  Humanized post is {len(rewritten)} chars — trimming toward ~{TARGET_POST_LENGTH}...")
+        trimmed = generate_text(
+            f"Tighten this LinkedIn post to about {TARGET_POST_LENGTH} characters. Keep the first line, the one "
+            f"main idea, the strongest 2-3 points and the closing question. Use simple everyday words and short "
+            f"sentences. Cut everything else. Plain text only.\n\nPost:\n{rewritten}\n\nOutput ONLY the post.",
+            HUMANIZE_SYSTEM_PROMPT,
+        ).strip()
+        trimmed = _re.sub(r'\*{1,3}(.+?)\*{1,3}', r'\1', trimmed)
+        trimmed = _re.sub(r'_{1,2}(.+?)_{1,2}', r'\1', trimmed).strip()
+        if trimmed and len(trimmed) < len(rewritten):
+            rewritten = trimmed
 
     # If the rewrite pushed it over the limit, ask the model to trim (same pattern as generate_post)
     for shorten_attempt in range(2):

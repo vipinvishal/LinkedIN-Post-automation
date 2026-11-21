@@ -139,9 +139,11 @@ Every run follows the same six steps (see `scripts/generate_and_schedule.py::mai
 1. **Research** — Exa pulls 5 recent sources on a topic drawn from the active content slot.
 2. **Generate** — Gemini writes the post using one of two body structures (problem→solution or
    scenario→risk→solution, alternated deterministically by day), with the opening line driven by
-   a formula picked from the [hook matrix](#hook-matrix). Target length: 900-1,300 characters —
-   short enough to read in one glance while scrolling, not an essay.
-3. **Humanize** — a second pass strips AI-sounding vocabulary, reveal-bridge phrasing, negative
+   a formula picked from the [hook matrix](#hook-matrix). Target length: 750-1,000 characters —
+   about 20 seconds to read. Plain everyday words, sentences of ~12 words, a short hook (12 words or
+   fewer) with a real number or surprise, one concrete example or analogy, and an easy pick-one closing
+   question. First-person claims are limited to reading/noticing — the model never invents hands-on work.
+3. **Humanize** — a second pass simplifies jargon, trims to the length target, strips AI-sounding vocabulary, reveal-bridge phrasing, negative
    parallelism, and manufactured sentence-rhythm tricks, without changing any fact, number, or claim.
 4. **Infographic** — Gemini turns the *same* post into structured "how it works" content (stages,
    4 numbered steps, a closing hook), rendered to PNG via a Jinja2/Playwright template. Because it's
