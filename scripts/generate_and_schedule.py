@@ -38,6 +38,8 @@ LINKEDIN_PERSON_ID    = os.environ.get("LINKEDIN_PERSON_ID")
 GEMINI_MODEL           = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
 GEMINI_FALLBACK_MODELS = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-3.6-flash"]
 MAX_RETRIES            = 4
+GEMINI_MAX_ATTEMPTS    = 2    # per model; move on to the next model quickly when overloaded
+GEMINI_TIMEOUT_MS      = 60000
 RETRY_BASE_SECONDS     = 15
 
 # ── Platform character limits ─────────────────────────────────────────────────
@@ -265,7 +267,7 @@ def _is_quota_error(error: Exception) -> bool:
 
 def _is_retryable_server_error(error: Exception) -> bool:
     msg = str(error).lower()
-    return "503" in msg or "unavailable" in msg or "high demand" in msg
+    return any(x in msg for x in ("503", "504", "unavailable", "high demand", "deadline", "timed out", "timeout", "disconnected"))
 
 
 def _is_daily_quota_exhausted(error: Exception) -> bool:
@@ -313,7 +315,7 @@ def generate_text(prompt: str, system_instruction: str) -> str:
         # ("Developer instruction is not enabled for api version v1"). Pin v1beta.
         client = genai.Client(
             api_key=api_key,
-            http_options=types.HttpOptions(api_version="v1beta"),
+            http_options=types.HttpOptions(api_version="v1beta", timeout=GEMINI_TIMEOUT_MS),
         )
         key_label = f"key#{key_index + 1} (...{api_key[-6:]})"
         daily_exhausted = False
@@ -323,7 +325,7 @@ def generate_text(prompt: str, system_instruction: str) -> str:
             if daily_exhausted:
                 break
             config = types.GenerateContentConfig(system_instruction=system_instruction)
-            for attempt in range(1, MAX_RETRIES + 1):
+            for attempt in range(1, GEMINI_MAX_ATTEMPTS + 1):
                 try:
                     response = client.models.generate_content(
                         model=model_id, contents=prompt, config=config
@@ -344,8 +346,8 @@ def generate_text(prompt: str, system_instruction: str) -> str:
                             break
                         wait = _parse_retry_seconds(e)
                         kind = "quota (429)" if _is_quota_error(e) else "overloaded (503)"
-                        print(f"  [Gemini] {kind} on {model_id} ({key_label}), attempt {attempt}/{MAX_RETRIES}. Retrying in {wait}s...")
-                        if attempt < MAX_RETRIES:
+                        print(f"  [Gemini] {kind} on {model_id} ({key_label}), attempt {attempt}/{GEMINI_MAX_ATTEMPTS}. Retrying in {wait}s...")
+                        if attempt < GEMINI_MAX_ATTEMPTS:
                             time.sleep(wait)
                         else:
                             print(f"  [Gemini] Retries exhausted for {model_id}, trying next model.")
