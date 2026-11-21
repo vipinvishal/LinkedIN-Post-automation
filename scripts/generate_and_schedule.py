@@ -36,7 +36,7 @@ LINKEDIN_ACCESS_TOKEN = os.environ.get("LINKEDIN_ACCESS_TOKEN")
 LINKEDIN_PERSON_ID    = os.environ.get("LINKEDIN_PERSON_ID")
 
 GEMINI_MODEL           = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
-GEMINI_FALLBACK_MODELS = ["gemini-flash-latest", "gemini-3.6-flash", "gemini-2.5-flash"]
+GEMINI_FALLBACK_MODELS = ["gemini-flash-latest", "gemini-2.5-flash", "gemini-3.6-flash"]
 MAX_RETRIES            = 4
 RETRY_BASE_SECONDS     = 15
 
@@ -309,7 +309,12 @@ def generate_text(prompt: str, system_instruction: str) -> str:
     last_error = None
 
     for key_index, api_key in enumerate(api_keys):
-        client = genai.Client(api_key=api_key)
+        # google-genai 3.x defaults to API v1, which rejects system instructions
+        # ("Developer instruction is not enabled for api version v1"). Pin v1beta.
+        client = genai.Client(
+            api_key=api_key,
+            http_options=types.HttpOptions(api_version="v1beta"),
+        )
         key_label = f"key#{key_index + 1} (...{api_key[-6:]})"
         daily_exhausted = False
         print(f"  [Gemini] Trying {key_label}")
